@@ -1,0 +1,11 @@
+{
+  "name": "Plant Story",
+  "short_name": "Plant Story",
+  "description": "식물 관리 기록 앱",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f6f7f2",
+  "theme_color": "#a8d889",
+  "orientation": "portrait",
+  "icons": []
+}

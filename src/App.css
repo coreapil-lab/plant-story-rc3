@@ -1,0 +1,455 @@
+:root {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Apple SD Gothic Neo",
+    "Noto Sans KR", system-ui, sans-serif;
+  color: #1f2d22;
+  background: #f6fbf4;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top left, rgba(196, 235, 184, 0.45), transparent 32%),
+    linear-gradient(180deg, #fbfff9 0%, #f2f8ef 100%);
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button {
+  border: none;
+  cursor: pointer;
+}
+
+.app {
+  width: 100%;
+  min-height: 100vh;
+}
+
+.page {
+  width: 100%;
+  max-width: 520px;
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 20px 18px 96px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.header-title {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  color: #1f3526;
+}
+
+.header-subtitle {
+  margin: 4px 0 0;
+  font-size: 14px;
+  color: #7c8f78;
+}
+
+.hero {
+  margin: 8px 0 20px;
+  padding: 22px 20px;
+  border-radius: 28px;
+  background:
+    linear-gradient(135deg, rgba(230, 248, 224, 0.95), rgba(255, 255, 255, 0.98)),
+    #ffffff;
+  box-shadow: 0 18px 45px rgba(91, 130, 82, 0.14);
+  border: 1px solid rgba(210, 234, 202, 0.9);
+  animation: fadeUp 0.45s ease both;
+}
+
+.hero-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 11px;
+  border-radius: 999px;
+  background: rgba(181, 226, 167, 0.36);
+  color: #477241;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.hero-title {
+  margin: 14px 0 6px;
+  font-size: 26px;
+  line-height: 1.2;
+  font-weight: 850;
+  letter-spacing: -0.04em;
+  color: #203622;
+}
+
+.hero-desc {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.55;
+  color: #758673;
+}
+
+.search-box {
+  position: relative;
+  margin: 14px 0 18px;
+}
+
+.search-input {
+  width: 100%;
+  height: 48px;
+  padding: 0 16px 0 42px;
+  border: 1px solid rgba(210, 228, 204, 0.95);
+  border-radius: 18px;
+  outline: none;
+  background: rgba(255, 255, 255, 0.92);
+  color: #243526;
+  box-shadow: 0 10px 24px rgba(102, 132, 91, 0.08);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.search-input:focus {
+  border-color: #9ed58e;
+  box-shadow: 0 14px 28px rgba(101, 151, 86, 0.14);
+  transform: translateY(-1px);
+}
+
+.search-icon {
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 17px;
+  color: #7b9276;
+}
+
+.plant-list {
+  display: grid;
+  gap: 14px;
+  animation: fadeUp 0.5s ease both;
+}
+
+.plant-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 16px;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid rgba(218, 234, 211, 0.9);
+  box-shadow: 0 14px 34px rgba(86, 120, 78, 0.12);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+
+.plant-card:active {
+  transform: scale(0.985);
+}
+
+.plant-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 18px 40px rgba(86, 120, 78, 0.16);
+  border-color: rgba(171, 219, 157, 0.95);
+}
+
+.plant-icon {
+  width: 58px;
+  height: 58px;
+  flex: 0 0 58px;
+  display: grid;
+  place-items: center;
+  border-radius: 20px;
+  background: linear-gradient(145deg, #edf9e9, #ffffff);
+  box-shadow: inset 0 0 0 1px rgba(206, 231, 198, 0.9);
+}
+
+.plant-icon svg {
+  width: 36px;
+  height: 36px;
+}
+
+.plant-info {
+  min-width: 0;
+  flex: 1;
+}
+
+.plant-name {
+  margin: 0 0 8px;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: #233627;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.plant-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.meta-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 10px;
+  border-radius: 999px;
+  background: #f1f9ee;
+  color: #52744b;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.detail-card,
+.form-card {
+  padding: 20px;
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid rgba(218, 234, 211, 0.95);
+  box-shadow: 0 16px 42px rgba(86, 120, 78, 0.13);
+  animation: fadeUp 0.45s ease both;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 800;
+  color: #38523a;
+}
+
+.form-input,
+.form-textarea {
+  width: 100%;
+  border: 1px solid rgba(209, 228, 202, 0.95);
+  border-radius: 18px;
+  background: #fbfffa;
+  color: #263728;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.form-input {
+  height: 48px;
+  padding: 0 14px;
+}
+
+.form-textarea {
+  min-height: 110px;
+  padding: 14px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.form-input:focus,
+.form-textarea:focus {
+  border-color: #9bd58a;
+  background: #ffffff;
+  box-shadow: 0 0 0 4px rgba(164, 218, 149, 0.18);
+}
+
+.button-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.primary-button,
+.secondary-button,
+.danger-button,
+.floating-button {
+  min-height: 48px;
+  border-radius: 18px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease;
+}
+
+.primary-button {
+  flex: 1;
+  background: linear-gradient(135deg, #9bdc87, #75c86a);
+  color: #ffffff;
+  box-shadow: 0 12px 24px rgba(101, 179, 86, 0.28);
+}
+
+.secondary-button {
+  flex: 1;
+  background: #eef7eb;
+  color: #4f7449;
+}
+
+.danger-button {
+  flex: 1;
+  background: #fff0ef;
+  color: #d8534a;
+}
+
+.primary-button:active,
+.secondary-button:active,
+.danger-button:active,
+.floating-button:active {
+  transform: scale(0.97);
+}
+
+.floating-button {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%);
+  width: calc(100% - 36px);
+  max-width: 484px;
+  background: linear-gradient(135deg, #9bdd86, #70c765);
+  color: #ffffff;
+  box-shadow: 0 18px 36px rgba(101, 179, 86, 0.32);
+  z-index: 20;
+}
+
+.empty-state {
+  padding: 34px 22px;
+  border-radius: 28px;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px dashed rgba(171, 211, 158, 0.95);
+  color: #7a8d75;
+}
+
+.empty-state-title {
+  margin: 0 0 8px;
+  font-size: 18px;
+  font-weight: 800;
+  color: #38513a;
+}
+
+.empty-state-desc {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.login-page {
+  width: 100%;
+  max-width: 460px;
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 28px 20px;
+  display: grid;
+  place-items: center;
+}
+
+.login-card {
+  width: 100%;
+  padding: 30px 24px;
+  border-radius: 32px;
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid rgba(218, 234, 211, 0.95);
+  box-shadow: 0 22px 54px rgba(86, 120, 78, 0.16);
+  text-align: center;
+  animation: fadeUp 0.5s ease both;
+}
+
+.login-title {
+  margin: 16px 0 8px;
+  font-size: 30px;
+  font-weight: 850;
+  letter-spacing: -0.05em;
+  color: #203622;
+}
+
+.login-desc {
+  margin: 0 0 22px;
+  color: #758673;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.google-button {
+  width: 100%;
+  height: 52px;
+  border-radius: 18px;
+  background: #f1f8ef;
+  color: #345336;
+  font-weight: 800;
+  box-shadow: inset 0 0 0 1px rgba(206, 231, 198, 0.9);
+}
+
+.top-button {
+  min-width: 44px;
+  height: 44px;
+  padding: 0 14px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.9);
+  color: #4d7048;
+  font-weight: 800;
+  box-shadow: 0 10px 24px rgba(102, 132, 91, 0.1);
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 420px) {
+  .page {
+    padding: 18px 14px 92px;
+  }
+
+  .header-title {
+    font-size: 25px;
+  }
+
+  .hero {
+    padding: 20px 18px;
+    border-radius: 26px;
+  }
+
+  .hero-title {
+    font-size: 24px;
+  }
+
+  .plant-card {
+    padding: 14px;
+    border-radius: 22px;
+  }
+
+  .plant-icon {
+    width: 54px;
+    height: 54px;
+    flex-basis: 54px;
+  }
+
+  .floating-button {
+    width: calc(100% - 28px);
+  }
+}
