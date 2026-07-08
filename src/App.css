@@ -561,3 +561,47 @@ button {
     font-size: 17px;
   }
 }
+/* RC4 - 메인 정보 글자 확대 보강 */
+@media (max-width: 768px) {
+  .plant-card p,
+  .plant-card span,
+  .plant-card div {
+    font-size: 17px !important;
+  }
+
+  .plant-card .plant-name {
+    font-size: 26px !important;
+  }
+
+  .plant-card .meta-pill,
+  .plant-card [class*="meta"],
+  .plant-card [class*="info"],
+  .plant-card [class*="badge"],
+  .plant-card [class*="pill"] {
+    font-size: 17px !important;
+    line-height: 1.35 !important;
+  }
+
+  .detail-card p,
+  .detail-card span,
+  .detail-card div {
+    font-size: 18px !important;
+    line-height: 1.45 !important;
+  }
+}
+.plant-name {
+  font-size: 22px;
+  line-height: 1.35;
+  font-weight: 800;
+}
+
+.plant-meta {
+  gap: 10px;
+}
+
+.meta-pill {
+  font-size: 17px;
+  line-height: 1.4;
+  font-weight: 700;
+  padding: 10px 12px;
+}
