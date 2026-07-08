@@ -2,6 +2,19 @@ import { loginWithGoogle } from "../services/authService";
 import "./Login.css";
 
 export default function Login() {
+  const handleLogin = async () => {
+    try {
+      await loginWithGoogle();
+    } catch (error) {
+      console.error(error);
+      alert(
+        error instanceof Error
+          ? `Google 로그인 실패: ${error.message}`
+          : "Google 로그인에 실패했습니다."
+      );
+    }
+  };
+
   return (
     <main className="login-page">
       <section className="login-card">
@@ -17,11 +30,7 @@ export default function Login() {
           나만의 식물 관리 다이어리
         </p>
 
-        <button
-          type="button"
-          className="google-button"
-          onClick={loginWithGoogle}
-        >
+        <button type="button" className="google-button" onClick={handleLogin}>
           Google로 시작하기
         </button>
       </section>
