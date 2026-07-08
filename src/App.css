@@ -1,6 +1,6 @@
 :root {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Apple SD Gothic Neo",
-    "Noto Sans KR", system-ui, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display",
+    "Apple SD Gothic Neo", "Noto Sans KR", system-ui, sans-serif;
   color: #1f2d22;
   background: #f6fbf4;
   font-synthesis: none;
@@ -11,6 +11,10 @@
 
 * {
   box-sizing: border-box;
+}
+
+html {
+  font-size: 18px;
 }
 
 body {
@@ -32,6 +36,7 @@ select {
 button {
   border: none;
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .app {
@@ -44,37 +49,39 @@ button {
   max-width: 520px;
   min-height: 100vh;
   margin: 0 auto;
-  padding: 20px 18px 96px;
+  padding: 22px 18px 108px;
 }
 
 .header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 18px;
+  gap: 14px;
+  margin-bottom: 20px;
 }
 
 .header-title {
   margin: 0;
-  font-size: 28px;
-  font-weight: 800;
-  letter-spacing: -0.04em;
+  font-size: 34px;
+  line-height: 1.15;
+  font-weight: 850;
+  letter-spacing: -0.045em;
   color: #1f3526;
 }
 
 .header-subtitle {
-  margin: 4px 0 0;
-  font-size: 14px;
-  color: #7c8f78;
+  margin: 6px 0 0;
+  font-size: 17px;
+  line-height: 1.45;
+  color: #71876e;
 }
 
 .hero {
-  margin: 8px 0 20px;
-  padding: 22px 20px;
-  border-radius: 28px;
+  margin: 10px 0 22px;
+  padding: 24px 22px;
+  border-radius: 30px;
   background:
-    linear-gradient(135deg, rgba(230, 248, 224, 0.95), rgba(255, 255, 255, 0.98)),
+    linear-gradient(135deg, rgba(230, 248, 224, 0.96), rgba(255, 255, 255, 0.99)),
     #ffffff;
   box-shadow: 0 18px 45px rgba(91, 130, 82, 0.14);
   border: 1px solid rgba(210, 234, 202, 0.9);
@@ -84,47 +91,53 @@ button {
 .hero-label {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 7px 11px;
+  gap: 7px;
+  padding: 8px 13px;
   border-radius: 999px;
-  background: rgba(181, 226, 167, 0.36);
+  background: rgba(181, 226, 167, 0.38);
   color: #477241;
-  font-size: 13px;
-  font-weight: 700;
+  font-size: 16px;
+  font-weight: 800;
 }
 
 .hero-title {
-  margin: 14px 0 6px;
-  font-size: 26px;
+  margin: 16px 0 8px;
+  font-size: 31px;
   line-height: 1.2;
   font-weight: 850;
-  letter-spacing: -0.04em;
+  letter-spacing: -0.045em;
   color: #203622;
 }
 
 .hero-desc {
   margin: 0;
-  font-size: 14px;
-  line-height: 1.55;
-  color: #758673;
+  font-size: 17px;
+  line-height: 1.6;
+  color: #6f846d;
 }
 
 .search-box {
   position: relative;
-  margin: 14px 0 18px;
+  margin: 16px 0 20px;
 }
 
 .search-input {
   width: 100%;
-  height: 48px;
-  padding: 0 16px 0 42px;
+  height: 58px;
+  padding: 0 18px 0 48px;
   border: 1px solid rgba(210, 228, 204, 0.95);
-  border-radius: 18px;
+  border-radius: 20px;
   outline: none;
-  background: rgba(255, 255, 255, 0.92);
+  background: rgba(255, 255, 255, 0.94);
   color: #243526;
+  font-size: 19px;
   box-shadow: 0 10px 24px rgba(102, 132, 91, 0.08);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.search-input::placeholder {
+  color: #8da188;
 }
 
 .search-input:focus {
@@ -135,30 +148,32 @@ button {
 
 .search-icon {
   position: absolute;
-  left: 15px;
+  left: 17px;
   top: 50%;
   transform: translateY(-50%);
-  font-size: 17px;
+  font-size: 20px;
   color: #7b9276;
 }
 
 .plant-list {
   display: grid;
-  gap: 14px;
+  gap: 16px;
   animation: fadeUp 0.5s ease both;
 }
 
 .plant-card {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 16px;
   width: 100%;
-  padding: 16px;
-  border-radius: 24px;
-  background: rgba(255, 255, 255, 0.96);
+  min-height: 112px;
+  padding: 20px;
+  border-radius: 26px;
+  background: rgba(255, 255, 255, 0.97);
   border: 1px solid rgba(218, 234, 211, 0.9);
   box-shadow: 0 14px 34px rgba(86, 120, 78, 0.12);
-  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+  transition: transform 0.18s ease, box-shadow 0.18s ease,
+    border-color 0.18s ease;
 }
 
 .plant-card:active {
@@ -172,19 +187,19 @@ button {
 }
 
 .plant-icon {
-  width: 58px;
-  height: 58px;
-  flex: 0 0 58px;
+  width: 64px;
+  height: 64px;
+  flex: 0 0 64px;
   display: grid;
   place-items: center;
-  border-radius: 20px;
+  border-radius: 22px;
   background: linear-gradient(145deg, #edf9e9, #ffffff);
   box-shadow: inset 0 0 0 1px rgba(206, 231, 198, 0.9);
 }
 
 .plant-icon svg {
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
 }
 
 .plant-info {
@@ -193,10 +208,11 @@ button {
 }
 
 .plant-name {
-  margin: 0 0 8px;
-  font-size: 18px;
-  font-weight: 800;
-  letter-spacing: -0.03em;
+  margin: 0 0 10px;
+  font-size: 28px;
+  line-height: 1.25;
+  font-weight: 850;
+  letter-spacing: -0.04em;
   color: #233627;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -206,40 +222,40 @@ button {
 .plant-meta {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 9px;
 }
 
 .meta-pill {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 7px 10px;
+  gap: 6px;
+  padding: 9px 12px;
   border-radius: 999px;
   background: #f1f9ee;
   color: #52744b;
-  font-size: 13px;
-  font-weight: 700;
+  font-size: 17px;
+  line-height: 1.25;
+  font-weight: 800;
 }
-
 .detail-card,
 .form-card {
-  padding: 20px;
-  border-radius: 28px;
-  background: rgba(255, 255, 255, 0.96);
+  padding: 24px;
+  border-radius: 30px;
+  background: rgba(255, 255, 255, 0.97);
   border: 1px solid rgba(218, 234, 211, 0.95);
   box-shadow: 0 16px 42px rgba(86, 120, 78, 0.13);
   animation: fadeUp 0.45s ease both;
 }
 
 .form-group {
-  margin-bottom: 16px;
+  margin-bottom: 20px;
 }
 
 .form-label {
   display: block;
-  margin-bottom: 8px;
-  font-size: 14px;
-  font-weight: 800;
+  margin-bottom: 10px;
+  font-size: 17px;
+  font-weight: 850;
   color: #38523a;
 }
 
@@ -247,23 +263,25 @@ button {
 .form-textarea {
   width: 100%;
   border: 1px solid rgba(209, 228, 202, 0.95);
-  border-radius: 18px;
+  border-radius: 20px;
   background: #fbfffa;
   color: #263728;
   outline: none;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  font-size: 19px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease,
+    background 0.2s ease;
 }
 
 .form-input {
-  height: 48px;
-  padding: 0 14px;
+  height: 58px;
+  padding: 0 16px;
 }
 
 .form-textarea {
-  min-height: 110px;
-  padding: 14px;
+  min-height: 130px;
+  padding: 16px;
   resize: vertical;
-  line-height: 1.5;
+  line-height: 1.55;
 }
 
 .form-input:focus,
@@ -275,19 +293,21 @@ button {
 
 .button-row {
   display: flex;
-  gap: 10px;
-  margin-top: 20px;
+  gap: 12px;
+  margin-top: 24px;
 }
 
 .primary-button,
 .secondary-button,
 .danger-button,
 .floating-button {
-  min-height: 48px;
-  border-radius: 18px;
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease;
+  min-height: 60px;
+  border-radius: 20px;
+  font-size: 21px;
+  font-weight: 850;
+  letter-spacing: -0.025em;
+  transition: transform 0.18s ease, box-shadow 0.18s ease,
+    opacity 0.18s ease;
 }
 
 .primary-button {
@@ -330,8 +350,8 @@ button {
 }
 
 .empty-state {
-  padding: 34px 22px;
-  border-radius: 28px;
+  padding: 38px 24px;
+  border-radius: 30px;
   text-align: center;
   background: rgba(255, 255, 255, 0.92);
   border: 1px dashed rgba(171, 211, 158, 0.95);
@@ -339,16 +359,16 @@ button {
 }
 
 .empty-state-title {
-  margin: 0 0 8px;
-  font-size: 18px;
-  font-weight: 800;
+  margin: 0 0 10px;
+  font-size: 22px;
+  font-weight: 850;
   color: #38513a;
 }
 
 .empty-state-desc {
   margin: 0;
-  font-size: 14px;
-  line-height: 1.5;
+  font-size: 17px;
+  line-height: 1.55;
 }
 
 .login-page {
@@ -363,9 +383,9 @@ button {
 
 .login-card {
   width: 100%;
-  padding: 30px 24px;
-  border-radius: 32px;
-  background: rgba(255, 255, 255, 0.96);
+  padding: 34px 26px;
+  border-radius: 34px;
+  background: rgba(255, 255, 255, 0.97);
   border: 1px solid rgba(218, 234, 211, 0.95);
   box-shadow: 0 22px 54px rgba(86, 120, 78, 0.16);
   text-align: center;
@@ -373,39 +393,54 @@ button {
 }
 
 .login-title {
-  margin: 16px 0 8px;
-  font-size: 30px;
+  margin: 18px 0 10px;
+  font-size: 36px;
+  line-height: 1.15;
   font-weight: 850;
   letter-spacing: -0.05em;
   color: #203622;
 }
 
 .login-desc {
-  margin: 0 0 22px;
-  color: #758673;
-  font-size: 14px;
+  margin: 0 0 24px;
+  color: #6f846d;
+  font-size: 18px;
   line-height: 1.55;
 }
 
 .google-button {
   width: 100%;
-  height: 52px;
-  border-radius: 18px;
+  height: 60px;
+  border-radius: 20px;
   background: #f1f8ef;
   color: #345336;
-  font-weight: 800;
+  font-size: 20px;
+  font-weight: 850;
   box-shadow: inset 0 0 0 1px rgba(206, 231, 198, 0.9);
 }
-
 .top-button {
-  min-width: 44px;
-  height: 44px;
-  padding: 0 14px;
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.9);
+  min-width: 52px;
+  height: 52px;
+  padding: 0 16px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.92);
   color: #4d7048;
-  font-weight: 800;
+  font-size: 18px;
+  font-weight: 850;
   box-shadow: 0 10px 24px rgba(102, 132, 91, 0.1);
+}
+
+.top-button:active {
+  transform: scale(0.97);
+}
+
+.app-loading {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  font-size: 22px;
+  font-weight: 700;
+  color: #466843;
 }
 
 @keyframes fadeUp {
@@ -420,92 +455,109 @@ button {
   }
 }
 
-@media (max-width: 420px) {
+/* Tablet */
+@media (max-width: 768px) {
+  html {
+    font-size: 18px;
+  }
+
   .page {
-    padding: 18px 14px 92px;
+    max-width: 560px;
+  }
+}
+
+/* Phone */
+@media (max-width: 420px) {
+  html {
+    font-size: 18px;
+  }
+
+  .page {
+    padding: 20px 16px 104px;
   }
 
   .header-title {
-    font-size: 25px;
+    font-size: 32px;
+  }
+
+  .header-subtitle {
+    font-size: 16px;
   }
 
   .hero {
-    padding: 20px 18px;
-    border-radius: 26px;
+    padding: 22px 20px;
+    border-radius: 28px;
   }
 
   .hero-title {
-    font-size: 24px;
+    font-size: 29px;
   }
 
-  .plant-card {
-    padding: 14px;
-    border-radius: 22px;
-  }
-
-  .plant-icon {
-    width: 54px;
-    height: 54px;
-    flex-basis: 54px;
-  }
-
-  .floating-button {
-    width: calc(100% - 28px);
-  }
-}
-/* RC4 - 큰 글자 접근성 개선 */
-@media (max-width: 768px) {
-  body {
-    font-size: 18px;
-  }
-
-  h1,
-  .app-title {
-    font-size: 36px;
-    line-height: 1.15;
-  }
-
-  .home-subtitle,
-  .login-card p {
+  .hero-desc {
     font-size: 17px;
-  }
-
-  .plant-card {
-    min-height: 106px;
-    padding: 20px;
-  }
-
-  .plant-card h2,
-  .plant-name {
-    font-size: 28px;
-    line-height: 1.25;
-  }
-
-  .plant-badge,
-  .plant-meta,
-  .plant-chip {
-    font-size: 17px;
-    line-height: 1.35;
-  }
-
-  input,
-  textarea,
-  select {
-    font-size: 18px;
   }
 
   .search-input {
-    font-size: 18px;
-    height: 54px;
-  }
-
-  button {
+    height: 56px;
     font-size: 18px;
   }
 
-  .add-plant-button,
-  .primary-button {
-    font-size: 22px;
+  .plant-card {
+    min-height: 108px;
+    padding: 18px;
+    border-radius: 24px;
+  }
+
+  .plant-icon {
+    width: 60px;
+    height: 60px;
+    flex-basis: 60px;
+  }
+
+  .plant-icon svg {
+    width: 38px;
+    height: 38px;
+  }
+
+  .plant-name {
+    font-size: 26px;
+  }
+
+  .meta-pill {
+    font-size: 16px;
+  }
+
+  .form-label {
+    font-size: 16px;
+  }
+
+  .form-input {
+    height: 56px;
+    font-size: 18px;
+  }
+
+  .form-textarea {
+    font-size: 18px;
+  }
+
+  .primary-button,
+  .secondary-button,
+  .danger-button,
+  .floating-button,
+  .google-button {
     min-height: 58px;
+    font-size: 20px;
+  }
+
+  .floating-button {
+    width: calc(100% - 32px);
+  }
+
+  .login-title {
+    font-size: 34px;
+  }
+
+  .login-desc {
+    font-size: 17px;
   }
 }
