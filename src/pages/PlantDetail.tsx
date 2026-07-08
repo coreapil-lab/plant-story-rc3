@@ -1,4 +1,5 @@
 import type { Plant } from "../types/plant";
+import "./PlantDetail.css";
 
 type PlantDetailProps = {
   plant: Plant;
@@ -106,8 +107,8 @@ function PlantDetail({
         {plant.nickname && <p className="hero-desc">{plant.nickname}</p>}
 
         <div className="plant-meta">
-          <span className="meta-pill">💧 물주기 {formatDPlus(wateredDays)}</span>
-          <span className="meta-pill">🌱 영양제 {formatDPlus(fertilizedDays)}</span>
+          <span className="meta-pill">💧 {formatDPlus(wateredDays)}</span>
+          <span className="meta-pill">🌱 {formatDPlus(fertilizedDays)}</span>
         </div>
       </section>
 
@@ -115,15 +116,25 @@ function PlantDetail({
         <h2 className="plant-name">기본 정보</h2>
 
         <div className="plant-list">
-          <div className="meta-pill">📅 입양일 {formatDate(plant.adoptedAt)} / {formatDPlus(adoptedDays)}</div>
-          <div className="meta-pill">💧 최근 물 준 날 {formatDate(plant.lastWateredAt)} / {plant.wateringIntervalDays}일 주기</div>
-          <div className="meta-pill">🌱 최근 영양제 {formatDate(plant.lastFertilizedAt)} / {plant.fertilizingIntervalDays}일 주기</div>
+          <div className="meta-pill">
+            📅 입양일 {formatDate(plant.adoptedAt)} / {formatDPlus(adoptedDays)}
+          </div>
+          <div className="meta-pill">
+            💧 최근 물 준 날 {formatDate(plant.lastWateredAt)} /{" "}
+            {plant.wateringIntervalDays}일 주기
+          </div>
+          <div className="meta-pill">
+            🌱 최근 영양제 {formatDate(plant.lastFertilizedAt)} /{" "}
+            {plant.fertilizingIntervalDays}일 주기
+          </div>
         </div>
       </section>
 
       <section className="detail-card">
         <h2 className="plant-name">메모</h2>
-        <p className="hero-desc">{plant.memo ? plant.memo : "작성된 메모가 없습니다."}</p>
+        <p className="hero-desc">
+          {plant.memo ? plant.memo : "작성된 메모가 없습니다."}
+        </p>
       </section>
 
       <div className="button-row">
