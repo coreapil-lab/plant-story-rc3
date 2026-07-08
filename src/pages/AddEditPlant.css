@@ -198,3 +198,60 @@ grid-template-columns:1fr;
 }
 
 }
+.form-card {
+  margin-top: 18px;
+}
+
+.form-label {
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.form-input,
+.form-textarea {
+  font-size: 17px;
+  min-height: 54px;
+}
+.form-card {
+  padding: 22px 20px;
+  border-radius: 26px;
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(213, 236, 204, 0.9);
+  box-shadow: 0 14px 40px rgba(83, 122, 75, 0.1);
+}
+
+.form-group {
+  margin-bottom: 18px;
+}
+
+.form-group:last-child {
+  margin-bottom: 0;
+}
+.form-input,
+.form-textarea {
+  width: 100%;
+  border: none;
+  outline: none;
+  border-radius: 18px;
+  background: #eef8ea;
+  color: #203622;
+  font-weight: 700;
+  box-sizing: border-box;
+}
+
+.form-input {
+  padding: 0 16px;
+}
+
+.form-textarea {
+  min-height: 130px;
+  padding: 15px 16px;
+  resize: none;
+  line-height: 1.5;
+}
+
+.form-input:focus,
+.form-textarea:focus {
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(105, 180, 110, 0.2);
+}

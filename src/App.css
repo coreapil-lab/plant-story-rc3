@@ -361,3 +361,59 @@ button {
     font-size: 14px;
   }
 }
+/* =========================
+   Detail / Form Common
+========================= */
+
+.detail-card {
+  margin-top: 18px;
+  padding: 22px 20px;
+  border-radius: 26px;
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(213, 236, 204, 0.9);
+  box-shadow: 0 14px 40px rgba(83, 122, 75, 0.1);
+}
+
+.detail-card .plant-list {
+  gap: 12px;
+}
+
+.detail-card .meta-pill {
+  width: 100%;
+  min-height: 42px;
+  justify-content: flex-start;
+  padding: 10px 14px;
+  font-size: 16px;
+}
+
+.button-row {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.primary-button,
+.danger-button {
+  width: 100%;
+  min-height: 56px;
+  border: none;
+  border-radius: 999px;
+  font-size: 18px;
+  font-weight: 800;
+  box-shadow: 0 14px 34px rgba(83, 122, 75, 0.14);
+}
+
+.primary-button {
+  background: linear-gradient(135deg, #69b46e, #86cb86);
+  color: #ffffff;
+}
+
+.danger-button {
+  background: #fff1f1;
+  color: #b33a3a;
+}
+
+.primary-button:hover,
+.danger-button:hover {
+  filter: brightness(1.03);
+}
