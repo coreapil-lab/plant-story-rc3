@@ -453,3 +453,59 @@ button {
     width: calc(100% - 28px);
   }
 }
+/* RC4 - 큰 글자 접근성 개선 */
+@media (max-width: 768px) {
+  body {
+    font-size: 18px;
+  }
+
+  h1,
+  .app-title {
+    font-size: 36px;
+    line-height: 1.15;
+  }
+
+  .home-subtitle,
+  .login-card p {
+    font-size: 17px;
+  }
+
+  .plant-card {
+    min-height: 106px;
+    padding: 20px;
+  }
+
+  .plant-card h2,
+  .plant-name {
+    font-size: 28px;
+    line-height: 1.25;
+  }
+
+  .plant-badge,
+  .plant-meta,
+  .plant-chip {
+    font-size: 17px;
+    line-height: 1.35;
+  }
+
+  input,
+  textarea,
+  select {
+    font-size: 18px;
+  }
+
+  .search-input {
+    font-size: 18px;
+    height: 54px;
+  }
+
+  button {
+    font-size: 18px;
+  }
+
+  .add-plant-button,
+  .primary-button {
+    font-size: 22px;
+    min-height: 58px;
+  }
+}
