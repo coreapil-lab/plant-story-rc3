@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { User } from 'firebase/auth';
 import {
   GoogleAuthProvider,
@@ -42,6 +42,58 @@ function App() {
   const [pageMode, setPageMode] = useState<PageMode>('home');
   const [selectedPlant, setSelectedPlant] = useState<Plant | null>(null);
 
+  const pageModeRef = useRef<PageMode>('home');
+  const selectedPlantRef = useRef<Plant | null>(null);
+  const pushedHistoryRef = useRef(false);
+
+  useEffect(() => {
+    pageModeRef.current = pageMode;
+    selectedPlantRef.current = selectedPlant;
+  }, [pageMode, selectedPlant]);
+
+  useEffect(() => {
+    const isSubPage = pageMode !== 'home';
+
+    if (isSubPage && !pushedHistoryRef.current) {
+      window.history.pushState({ plantStoryPage: pageMode }, '');
+      pushedHistoryRef.current = true;
+    }
+
+    if (!isSubPage) {
+      pushedHistoryRef.current = false;
+    }
+  }, [pageMode]);
+
+  useEffect(() => {
+    const handlePopState = () => {
+      const currentPageMode = pageModeRef.current;
+      const currentSelectedPlant = selectedPlantRef.current;
+
+      if (currentPageMode === 'edit') {
+        setPageMode(currentSelectedPlant ? 'detail' : 'home');
+        return;
+      }
+
+      if (currentPageMode === 'add') {
+        setSelectedPlant(null);
+        setPageMode('home');
+        return;
+      }
+
+      if (currentPageMode === 'detail') {
+        setSelectedPlant(null);
+        setPageMode('home');
+        return;
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, []);
+
   useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
@@ -65,8 +117,20 @@ function App() {
     const unsubscribePlants = subscribePlants(
       user.uid,
       (nextPlants) => {
-        setPlants(nextPlants);
+        const safePlants = Array.isArray(nextPlants) ? nextPlants : [];
+
+        setPlants(safePlants);
         setPlantsLoading(false);
+
+        setSelectedPlant((currentSelectedPlant) => {
+          if (!currentSelectedPlant) return null;
+
+          const latestSelectedPlant = safePlants.find(
+            (plant) => plant.id === currentSelectedPlant.id
+          );
+
+          return latestSelectedPlant ?? currentSelectedPlant;
+        });
       },
       (error) => {
         console.error(error);
