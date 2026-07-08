@@ -44,7 +44,7 @@ function Home({
 
       <section className="hero">
         <span className="hero-label">🌿 오늘의 식물</span>
-        <h2 className="hero-title">식물의 하루를 가볍게 기록하세요</h2>
+        <h2 className="hero-title">식물의 쉽게 편하게 기록하세요</h2>
         <p className="hero-desc">
           물주기와 영양제 기록을 한눈에 확인할 수 있습니다.
         </p>
