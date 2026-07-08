@@ -47,7 +47,7 @@ function PlantIcon() {
 }
 
 function formatDPlus(days: number | null) {
-  if (days === null) return "기록 없음";
+  if (days === null) return "없음";
   return `D+${days}`;
 }
 
@@ -63,8 +63,8 @@ function PlantCard({ plant, onClick }: PlantCardProps) {
         <h3 className="plant-name">{plant.name}</h3>
 
         <div className="plant-meta">
-          <span className="meta-pill">💧 물주기 {formatDPlus(wateredDays)}</span>
-          <span className="meta-pill">🌱 영양제 {formatDPlus(fertilizedDays)}</span>
+          <span className="meta-pill">💧 {formatDPlus(wateredDays)}</span>
+          <span className="meta-pill">🌱 {formatDPlus(fertilizedDays)}</span>
         </div>
       </div>
     </button>
