@@ -19,7 +19,7 @@ import {
   updateWateredAt,
 } from './services/plantService';
 
-import Home from './pages/Home';
+import Home from './Home';
 import AddEditPlant from './pages/AddEditPlant';
 import PlantDetail from './pages/PlantDetail';
 
