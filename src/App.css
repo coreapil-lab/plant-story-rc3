@@ -605,3 +605,34 @@ button {
   font-weight: 700;
   padding: 10px 12px;
 }
+.plant-card {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.plant-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.plant-meta {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+.meta-pill {
+  white-space: nowrap;
+}
+@media (max-width: 430px) {
+  .plant-meta {
+    gap: 8px;
+  }
+
+  .meta-pill {
+    font-size: 15px;
+    padding: 8px 10px;
+  }
+}
