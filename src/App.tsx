@@ -15,6 +15,7 @@ import {
   createPlant,
   deletePlant,
   subscribePlants,
+  updateFertilizedAt,
   updatePlant,
   updateWateredAt,
 } from './services/plantService';
@@ -25,6 +26,12 @@ import PlantDetail from './pages/PlantDetail';
 
 type PageMode = 'home' | 'add' | 'edit' | 'detail';
 
+type PlantStoryHistoryState = {
+  plantStory: true;
+  pageMode: PageMode;
+  plantId: string | null;
+};
+
 function getTodayString() {
   const today = new Date();
   const year = today.getFullYear();
@@ -32,6 +39,17 @@ function getTodayString() {
   const date = String(today.getDate()).padStart(2, '0');
 
   return `${year}-${month}-${date}`;
+}
+
+function createHistoryState(
+  pageMode: PageMode,
+  plantId: string | null
+): PlantStoryHistoryState {
+  return {
+    plantStory: true,
+    pageMode,
+    plantId,
+  };
 }
 
 function App() {
@@ -42,24 +60,26 @@ function App() {
   const [pageMode, setPageMode] = useState<PageMode>('home');
   const [selectedPlant, setSelectedPlant] = useState<Plant | null>(null);
 
-  useEffect(() => {
-    const handlePopState = () => {
-      setSelectedPlant(null);
-      setPageMode('home');
-    };
+  const movePage = (
+    nextPageMode: PageMode,
+    nextPlant: Plant | null,
+    historyMode: 'push' | 'replace' = 'push'
+  ) => {
+    setSelectedPlant(nextPlant);
+    setPageMode(nextPageMode);
 
-    window.addEventListener('popstate', handlePopState);
+    const nextState = createHistoryState(
+      nextPageMode,
+      nextPlant ? nextPlant.id : null
+    );
 
-    return () => {
-      window.removeEventListener('popstate', handlePopState);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (pageMode !== 'home') {
-      window.history.pushState({ plantStoryPage: pageMode }, '');
+    if (historyMode === 'replace') {
+      window.history.replaceState(nextState, '');
+      return;
     }
-  }, [pageMode]);
+
+    window.history.pushState(nextState, '');
+  };
 
   useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(auth, (currentUser) => {
@@ -70,7 +90,10 @@ function App() {
         setPlants([]);
         setSelectedPlant(null);
         setPageMode('home');
+        return;
       }
+
+      window.history.replaceState(createHistoryState('home', null), '');
     });
 
     return () => unsubscribeAuth();
@@ -97,7 +120,42 @@ function App() {
     return () => unsubscribePlants();
   }, [user]);
 
-  const handleLogin = async () => {
+  useEffect(() => {
+    const handlePopState = (event: PopStateEvent) => {
+      const state = event.state as PlantStoryHistoryState | null;
+
+      if (!state || state.plantStory !== true || state.pageMode === 'home') {
+        setSelectedPlant(null);
+        setPageMode('home');
+        return;
+      }
+
+      if (state.pageMode === 'add') {
+        setSelectedPlant(null);
+        setPageMode('add');
+        return;
+      }
+
+      const targetPlant = plants.find((plant) => plant.id === state.plantId);
+
+      if (!targetPlant) {
+        setSelectedPlant(null);
+        setPageMode('home');
+        window.history.replaceState(createHistoryState('home', null), '');
+        return;
+      }
+
+      setSelectedPlant(targetPlant);
+      setPageMode(state.pageMode);
+    };
+
+    window.addEventListener('popstate', handlePopState);
+
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [plants]);
+    const handleLogin = async () => {
     try {
       const provider = new GoogleAuthProvider();
       await signInWithPopup(auth, provider);
@@ -117,27 +175,23 @@ function App() {
   };
 
   const handleAddPlant = () => {
-    setSelectedPlant(null);
-    setPageMode('add');
+    movePage('add', null);
   };
 
   const handleSelectPlant = (plant: Plant) => {
-    setSelectedPlant(plant);
-    setPageMode('detail');
+    movePage('detail', plant);
   };
 
   const handleEditPlant = (plant: Plant) => {
-    setSelectedPlant(plant);
-    setPageMode('edit');
+    movePage('edit', plant);
   };
 
   const handleCancel = () => {
-    setPageMode(selectedPlant ? 'detail' : 'home');
+    window.history.back();
   };
 
   const handleBackHome = () => {
-    setSelectedPlant(null);
-    setPageMode('home');
+    window.history.back();
   };
 
   const handleSavePlant = async (values: PlantFormValues) => {
@@ -150,18 +204,17 @@ function App() {
       if (pageMode === 'edit' && selectedPlant) {
         await updatePlant(selectedPlant.id, values);
 
-        setSelectedPlant({
+        const updatedPlant = {
           ...selectedPlant,
           ...values,
           updatedAt: new Date().toISOString(),
-        });
+        };
 
-        setPageMode('detail');
+        movePage('detail', updatedPlant, 'replace');
       } else {
         await createPlant(user.uid, values);
 
-        setSelectedPlant(null);
-        setPageMode('home');
+        movePage('home', null, 'replace');
       }
     } catch (error) {
       console.error(error);
@@ -177,8 +230,7 @@ function App() {
     try {
       await deletePlant(plantId);
 
-      setSelectedPlant(null);
-      setPageMode('home');
+      movePage('home', null, 'replace');
     } catch (error) {
       console.error(error);
       alert('식물을 삭제하지 못했습니다.');
@@ -199,6 +251,23 @@ function App() {
     } catch (error) {
       console.error(error);
       alert('물 준 날짜를 저장하지 못했습니다.');
+    }
+  };
+
+  const handleFertilizePlant = async (plant: Plant) => {
+    try {
+      const today = getTodayString();
+
+      await updateFertilizedAt(plant.id, today);
+
+      setSelectedPlant({
+        ...plant,
+        lastFertilizedAt: today,
+        updatedAt: new Date().toISOString(),
+      });
+    } catch (error) {
+      console.error(error);
+      alert('영양제 준 날짜를 저장하지 못했습니다.');
     }
   };
 
@@ -287,6 +356,7 @@ function App() {
         onEdit={handleEditPlant}
         onDelete={handleDeletePlant}
         onWater={handleWaterPlant}
+        onFertilize={handleFertilizePlant}
       />
     );
   }

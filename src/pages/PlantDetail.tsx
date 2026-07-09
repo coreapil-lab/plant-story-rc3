@@ -7,6 +7,7 @@ type PlantDetailProps = {
   onEdit: (plant: Plant) => void;
   onDelete: (plantId: string) => Promise<void>;
   onWater: (plant: Plant) => Promise<void>;
+  onFertilize: (plant: Plant) => Promise<void>;
 };
 
 const MS_PER_DAY = 1000 * 60 * 60 * 24;
@@ -47,13 +48,7 @@ function formatDate(dateString: string) {
 function PlantIcon() {
   return (
     <div className="plant-icon" aria-hidden="true">
-      <svg
-        width="74"
-        height="74"
-        viewBox="0 0 96 96"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
+      <svg width="74" height="74" viewBox="0 0 96 96" fill="none">
         <rect x="32" y="58" width="32" height="22" rx="6" fill="#D9A066" />
         <path
           d="M48 61C48 44 48 35 48 23"
@@ -75,6 +70,7 @@ function PlantDetail({
   onEdit,
   onDelete,
   onWater,
+  onFertilize,
 }: PlantDetailProps) {
   const adoptedDays = getDaysFrom(plant.adoptedAt);
   const wateredDays = getDaysFrom(plant.lastWateredAt);
@@ -119,10 +115,12 @@ function PlantDetail({
           <div className="meta-pill">
             📅 입양일 {formatDate(plant.adoptedAt)} / {formatDPlus(adoptedDays)}
           </div>
+
           <div className="meta-pill">
             💧 최근 물 준 날 {formatDate(plant.lastWateredAt)} /{" "}
             {plant.wateringIntervalDays}일 주기
           </div>
+
           <div className="meta-pill">
             🌱 최근 영양제 {formatDate(plant.lastFertilizedAt)} /{" "}
             {plant.fertilizingIntervalDays}일 주기
@@ -140,6 +138,16 @@ function PlantDetail({
       <div className="button-row">
         <button type="button" className="primary-button" onClick={() => onWater(plant)}>
           오늘 물 줬어요
+        </button>
+      </div>
+
+      <div className="button-row">
+        <button
+          type="button"
+          className="primary-button fertilizer-button"
+          onClick={() => onFertilize(plant)}
+        >
+          🌱 오늘 영양제 줬어요
         </button>
       </div>
 
