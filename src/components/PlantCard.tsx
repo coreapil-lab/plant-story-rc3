@@ -27,21 +27,15 @@ function formatDPlus(days: number | null) {
   return `D+${days}`;
 }
 
-function PlantIcon() {
-  return (
-    <div className="ps-card-icon" aria-hidden="true">
-      🌿
-    </div>
-  );
-}
-
 function PlantCard({ plant, onClick }: PlantCardProps) {
   const wateredDays = getDaysFrom(plant.lastWateredAt);
   const fertilizedDays = getDaysFrom(plant.lastFertilizedAt);
 
   return (
     <button className="ps-plant-card" type="button" onClick={() => onClick(plant)}>
-      <PlantIcon />
+      <div className="ps-card-icon" aria-hidden="true">
+        🌿
+      </div>
 
       <div className="ps-card-name">{plant.name}</div>
 
