@@ -1,23 +1,21 @@
 .ps-plant-card {
   width: 100%;
+  max-width: 100%;
   min-width: 0;
-  height: 176px;
-
+  height: 166px;
   border: 0;
-  border-radius: 24px;
-  padding: 12px 10px;
-
+  border-radius: 22px;
+  padding: 10px 8px;
   background: #ffffff;
-
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 9px;
-
-  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.07);
-
+  gap: 8px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.07);
   cursor: pointer;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 .ps-plant-card:active {
@@ -25,29 +23,25 @@
 }
 
 .ps-card-icon {
-  width: 58px;
-  height: 58px;
-
-  border-radius: 20px;
+  width: 52px;
+  height: 52px;
+  flex-shrink: 0;
+  border-radius: 18px;
   background: linear-gradient(135deg, #edf9e8, #fbfff7);
-
   display: flex;
   align-items: center;
   justify-content: center;
-
-  font-size: 34px;
+  font-size: 31px;
   line-height: 1;
 }
 
 .ps-card-name {
   width: 100%;
-
+  min-width: 0;
   text-align: center;
-
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 800;
   color: #143c34;
-
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -55,7 +49,7 @@
 
 .ps-card-meta {
   width: 100%;
-
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 5px;
@@ -63,41 +57,16 @@
 
 .ps-card-meta span {
   width: 100%;
-  height: 27px;
-
+  height: 26px;
   border-radius: 999px;
-
   background: #f5faf2;
   border: 1px solid #d8ecd0;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 800;
   color: #245a31;
-}
-
-@media (max-width: 390px) {
-  .ps-plant-card {
-    height: 166px;
-    padding: 10px 8px;
-    gap: 8px;
-  }
-
-  .ps-card-icon {
-    width: 52px;
-    height: 52px;
-    font-size: 31px;
-  }
-
-  .ps-card-name {
-    font-size: 15px;
-  }
-
-  .ps-card-meta span {
-    height: 26px;
-    font-size: 12px;
-  }
+  box-sizing: border-box;
+  white-space: nowrap;
 }

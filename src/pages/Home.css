@@ -1,9 +1,12 @@
 .page {
+  width: 100%;
   min-height: 100vh;
   max-width: 520px;
   margin: 0 auto;
   padding: 14px 14px 110px;
   background: #f6f7f2;
+  overflow-x: hidden;
+  box-sizing: border-box;
 }
 
 .home-header {
@@ -24,9 +27,11 @@
   font-size: 24px;
   font-weight: 800;
   color: #1d1d1f;
+  white-space: nowrap;
 }
 
 .logout-button {
+  flex-shrink: 0;
   height: 40px;
   border: 0;
   border-radius: 14px;
@@ -39,6 +44,7 @@
 }
 
 .search-box {
+  width: 100%;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -48,10 +54,12 @@
   border-radius: 18px;
   background: #ffffff;
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.07);
+  box-sizing: border-box;
 }
 
 .search-input {
   width: 100%;
+  min-width: 0;
   border: 0;
   outline: none;
   background: transparent;
@@ -60,14 +68,18 @@
 }
 
 .plant-list {
+  width: 100%;
   display: grid !important;
   grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-  gap: 14px !important;
+  gap: 12px !important;
   align-items: stretch !important;
+  box-sizing: border-box;
 }
 
 .plant-list > * {
   min-width: 0 !important;
+  max-width: 100% !important;
+  box-sizing: border-box;
 }
 
 .empty-box {
@@ -82,15 +94,15 @@
 
 .floating-add-button {
   position: fixed;
-  right: 22px;
+  right: 18px;
   bottom: calc(22px + env(safe-area-inset-bottom));
-  width: 66px;
-  height: 66px;
+  width: 62px;
+  height: 62px;
   border: 0;
   border-radius: 50%;
   background: #a8d889;
   color: #ffffff;
-  font-size: 40px;
+  font-size: 38px;
   font-weight: 600;
   line-height: 1;
   box-shadow: 0 18px 40px rgba(99, 170, 75, 0.35);
@@ -99,15 +111,4 @@
 
 .floating-add-button:active {
   transform: scale(0.96);
-}
-
-@media (max-width: 390px) {
-  .page {
-    padding-left: 12px;
-    padding-right: 12px;
-  }
-
-  .plant-list {
-    gap: 12px !important;
-  }
 }
