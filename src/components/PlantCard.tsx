@@ -1,4 +1,5 @@
 import type { Plant } from "../types/plant";
+import "./PlantCard.css";
 
 type PlantCardProps = {
   plant: Plant;
@@ -21,34 +22,17 @@ function getDaysFrom(dateString: string) {
   return Math.floor((today.getTime() - target.getTime()) / MS_PER_DAY);
 }
 
-function PlantIcon() {
-  return (
-    <div className="plant-icon" aria-hidden="true">
-      <svg
-        width="74"
-        height="74"
-        viewBox="0 0 96 96"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <rect x="32" y="58" width="32" height="22" rx="6" fill="#D9A066" />
-        <path
-          d="M48 61C48 44 48 35 48 23"
-          stroke="#4F8F62"
-          strokeWidth="5"
-          strokeLinecap="round"
-        />
-        <path d="M46 39C31 38 23 30 22 18C35 18 45 25 46 39Z" fill="#79B77B" />
-        <path d="M50 45C66 44 75 35 76 22C61 22 51 30 50 45Z" fill="#67A96B" />
-        <path d="M47 54C34 54 26 47 25 36C38 36 46 42 47 54Z" fill="#8BCB8E" />
-      </svg>
-    </div>
-  );
-}
-
 function formatDPlus(days: number | null) {
   if (days === null) return "없음";
   return `D+${days}`;
+}
+
+function PlantIcon() {
+  return (
+    <div className="ps-card-icon" aria-hidden="true">
+      🌿
+    </div>
+  );
 }
 
 function PlantCard({ plant, onClick }: PlantCardProps) {
@@ -56,16 +40,14 @@ function PlantCard({ plant, onClick }: PlantCardProps) {
   const fertilizedDays = getDaysFrom(plant.lastFertilizedAt);
 
   return (
-    <button className="plant-card" type="button" onClick={() => onClick(plant)}>
+    <button className="ps-plant-card" type="button" onClick={() => onClick(plant)}>
       <PlantIcon />
 
-      <div className="plant-info">
-        <h3 className="plant-name">{plant.name}</h3>
+      <div className="ps-card-name">{plant.name}</div>
 
-        <div className="plant-meta">
-          <span className="meta-pill">💧 {formatDPlus(wateredDays)}</span>
-          <span className="meta-pill">🌱 {formatDPlus(fertilizedDays)}</span>
-        </div>
+      <div className="ps-card-meta">
+        <span>💧 {formatDPlus(wateredDays)}</span>
+        <span>🌱 {formatDPlus(fertilizedDays)}</span>
       </div>
     </button>
   );

@@ -1,110 +1,80 @@
-.plant-card {
+.ps-plant-card {
+  width: 100%;
+  min-width: 0;
+  height: 190px;
+
+  border: 0;
+  border-radius: 24px;
+  padding: 14px 10px;
+
+  background: #ffffff;
+
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: center;
+  gap: 10px;
 
-  width: 100%;
-  aspect-ratio: 1 / 1;
-
-  border: none;
-  border-radius: 22px;
-  background: #ffffff;
-
-  padding: 14px 10px;
-
-  box-shadow:
-    0 8px 20px rgba(0,0,0,.06),
-    0 2px 6px rgba(0,0,0,.04);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.07);
 
   cursor: pointer;
-
-  transition: transform .15s ease;
 }
 
-.plant-card:active {
-  transform: scale(.97);
+.ps-plant-card:active {
+  transform: scale(0.97);
 }
 
-.plant-icon {
+.ps-card-icon {
+  width: 62px;
+  height: 62px;
+
+  border-radius: 20px;
+  background: linear-gradient(135deg, #edf9e8, #fbfff7);
+
   display: flex;
   align-items: center;
   justify-content: center;
 
-  width: 92px;
-  height: 92px;
-
-  margin-bottom: 10px;
+  font-size: 36px;
+  line-height: 1;
 }
 
-.plant-icon svg{
-  width:90px;
-  height:90px;
+.ps-card-name {
+  width: 100%;
+
+  text-align: center;
+
+  font-size: 17px;
+  font-weight: 800;
+  color: #143c34;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.plant-info{
-  width:100%;
-  text-align:center;
+.ps-card-meta {
+  width: 100%;
+
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
-.plant-name{
-  margin:0 0 12px;
-  font-size:17px;
-  font-weight:700;
-  color:#1d1d1f;
+.ps-card-meta span {
+  width: 100%;
+  height: 28px;
 
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
+  border-radius: 999px;
 
-.plant-meta{
-  display:flex;
-  flex-direction:column;
-  gap:6px;
-}
+  background: #f5faf2;
+  border: 1px solid #d8ecd0;
 
-.meta-pill{
-  display:flex;
-  align-items:center;
-  justify-content:center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-  height:28px;
-
-  border-radius:999px;
-
-  background:#f3f9ef;
-
-  color:#4d8f52;
-
-  font-size:13px;
-
-  font-weight:700;
-}
-
-@media (max-width:390px){
-
-  .plant-card{
-    padding:12px 8px;
-  }
-
-  .plant-icon{
-    width:82px;
-    height:82px;
-  }
-
-  .plant-icon svg{
-    width:80px;
-    height:80px;
-  }
-
-  .plant-name{
-    font-size:15px;
-  }
-
-  .meta-pill{
-    font-size:12px;
-    height:26px;
-  }
-
+  font-size: 13px;
+  font-weight: 800;
+  color: #245a31;
 }

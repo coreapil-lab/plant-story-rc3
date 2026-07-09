@@ -2,7 +2,7 @@
   min-height: 100vh;
   max-width: 520px;
   margin: 0 auto;
-  padding: 18px 18px 110px;
+  padding: 14px 16px 110px;
   background: #f6f7f2;
 }
 
@@ -14,14 +14,14 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 14px 0;
-  background: rgba(246, 247, 242, 0.86);
+  padding: 8px 0 14px;
+  background: rgba(246, 247, 242, 0.9);
   backdrop-filter: blur(18px);
 }
 
 .home-header h1 {
   margin: 0;
-  font-size: 24px;
+  font-size: 26px;
   font-weight: 800;
   color: #1d1d1f;
 }
@@ -29,7 +29,7 @@
 .logout-button {
   height: 40px;
   border: 0;
-  border-radius: 14px;
+  border-radius: 16px;
   padding: 0 14px;
   background: #ffffff;
   font-size: 14px;
@@ -42,9 +42,9 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  height: 48px;
-  margin: 12px 0 18px;
-  padding: 0 14px;
+  height: 56px;
+  margin: 10px 0 18px;
+  padding: 0 16px;
   border-radius: 18px;
   background: #ffffff;
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.07);
@@ -55,7 +55,7 @@
   border: 0;
   outline: none;
   background: transparent;
-  font-size: 17px;
+  font-size: 18px;
   color: #1d1d1f;
 }
 
@@ -63,6 +63,7 @@
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 14px;
+  align-items: stretch;
 }
 
 .empty-box {
@@ -95,10 +96,15 @@
 .floating-add-button:active {
   transform: scale(0.96);
 }
+.page .plant-list {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 14px !important;
+  align-items: stretch !important;
+}
 
-@media (max-width: 390px) {
-  .page {
-    padding-left: 14px;
-    padding-right: 14px;
-  }
+.page .plant-list > .plant-card {
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
 }
