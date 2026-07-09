@@ -111,26 +111,33 @@ function PlantDetail({
       <section className="detail-card">
         <h2 className="plant-name">기본 정보</h2>
 
-        <div className="plant-list">
-          <div className="meta-pill">
-            📅 입양일 {formatDate(plant.adoptedAt)} / {formatDPlus(adoptedDays)}
+        <div className="info-list">
+          <div className="info-row">
+            <span className="info-label">📅 입양일</span>
+            <span className="info-value">
+              {formatDate(plant.adoptedAt)} / {formatDPlus(adoptedDays)}
+            </span>
           </div>
 
-          <div className="meta-pill">
-            💧 최근 물 준 날 {formatDate(plant.lastWateredAt)} /{" "}
-            {plant.wateringIntervalDays}일 주기
+          <div className="info-row">
+            <span className="info-label">💧 최근 물 준 날</span>
+            <span className="info-value">
+              {formatDate(plant.lastWateredAt)} / {plant.wateringIntervalDays}일 주기
+            </span>
           </div>
 
-          <div className="meta-pill">
-            🌱 최근 영양제 {formatDate(plant.lastFertilizedAt)} /{" "}
-            {plant.fertilizingIntervalDays}일 주기
+          <div className="info-row">
+            <span className="info-label">🌱 최근 영양제</span>
+            <span className="info-value">
+              {formatDate(plant.lastFertilizedAt)} / {plant.fertilizingIntervalDays}일 주기
+            </span>
           </div>
         </div>
       </section>
 
       <section className="detail-card">
         <h2 className="plant-name">메모</h2>
-        <p className="hero-desc">
+        <p className="memo-text">
           {plant.memo ? plant.memo : "작성된 메모가 없습니다."}
         </p>
       </section>
