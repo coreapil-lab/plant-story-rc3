@@ -32,9 +32,17 @@ function PlantCard({ plant, onClick }: PlantCardProps) {
   const fertilizedDays = getDaysFrom(plant.lastFertilizedAt);
 
   return (
-    <button className="ps-plant-card" type="button" onClick={() => onClick(plant)}>
+    <button
+      className="ps-plant-card"
+      type="button"
+      onClick={() => onClick(plant)}
+    >
       <div className="ps-card-icon" aria-hidden="true">
-        🌿
+        {plant.imageUrl ? (
+          <img src={plant.imageUrl} alt={plant.name} />
+        ) : (
+          "🌿"
+        )}
       </div>
 
       <div className="ps-card-name">{plant.name}</div>
