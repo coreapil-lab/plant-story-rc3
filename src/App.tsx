@@ -1,16 +1,16 @@
-import { useEffect, useState } from 'react';
-import type { User } from 'firebase/auth';
+import { useEffect, useState } from "react";
+import type { User } from "firebase/auth";
 import {
   GoogleAuthProvider,
   onAuthStateChanged,
   signInWithPopup,
   signOut,
-} from 'firebase/auth';
+} from "firebase/auth";
 
-import './App.css';
+import "./App.css";
 
-import { auth } from './firebase';
-import type { Plant, PlantFormValues } from './types/plant';
+import { auth } from "./firebase";
+import type { Plant, PlantFormValues } from "./types/plant";
 import {
   createPlant,
   deletePlant,
@@ -18,13 +18,14 @@ import {
   updateFertilizedAt,
   updatePlant,
   updateWateredAt,
-} from './services/plantService';
+} from "./services/plantService";
 
-import Home from './Home';
-import AddEditPlant from './pages/AddEditPlant';
-import PlantDetail from './pages/PlantDetail';
+import Home from "./pages/Home";
+import AddEditPlant from "./pages/AddEditPlant";
+import PlantDetail from "./pages/PlantDetail";
+import Login from "./pages/Login";
 
-type PageMode = 'home' | 'add' | 'edit' | 'detail';
+type PageMode = "home" | "add" | "edit" | "detail";
 
 type PlantStoryHistoryState = {
   plantStory: true;
@@ -35,15 +36,14 @@ type PlantStoryHistoryState = {
 function getTodayString() {
   const today = new Date();
   const year = today.getFullYear();
-  const month = String(today.getMonth() + 1).padStart(2, '0');
-  const date = String(today.getDate()).padStart(2, '0');
-
+  const month = String(today.getMonth() + 1).padStart(2, "0");
+  const date = String(today.getDate()).padStart(2, "0");
   return `${year}-${month}-${date}`;
 }
 
 function createHistoryState(
   pageMode: PageMode,
-  plantId: string | null
+  plantId: string | null = null
 ): PlantStoryHistoryState {
   return {
     plantStory: true,
@@ -54,305 +54,216 @@ function createHistoryState(
 
 function App() {
   const [user, setUser] = useState<User | null>(null);
-  const [authLoading, setAuthLoading] = useState(true);
   const [plants, setPlants] = useState<Plant[]>([]);
-  const [plantsLoading, setPlantsLoading] = useState(false);
-  const [pageMode, setPageMode] = useState<PageMode>('home');
-  const [selectedPlant, setSelectedPlant] = useState<Plant | null>(null);
+  const [pageMode, setPageMode] = useState<PageMode>("home");
+  const [selectedPlantId, setSelectedPlantId] = useState<string | null>(null);
+  const [isAuthLoading, setIsAuthLoading] = useState(true);
+  const [isPlantsLoading, setIsPlantsLoading] = useState(false);
 
-  const movePage = (
-    nextPageMode: PageMode,
-    nextPlant: Plant | null,
-    historyMode: 'push' | 'replace' = 'push'
-  ) => {
-    setSelectedPlant(nextPlant);
-    setPageMode(nextPageMode);
-
-    const nextState = createHistoryState(
-      nextPageMode,
-      nextPlant ? nextPlant.id : null
-    );
-
-    if (historyMode === 'replace') {
-      window.history.replaceState(nextState, '');
-      return;
-    }
-
-    window.history.pushState(nextState, '');
-  };
+  const selectedPlant =
+    plants.find((plant) => plant.id === selectedPlantId) ?? null;
 
   useEffect(() => {
-    const unsubscribeAuth = onAuthStateChanged(auth, (currentUser) => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
-      setAuthLoading(false);
+      setIsAuthLoading(false);
 
       if (!currentUser) {
         setPlants([]);
-        setSelectedPlant(null);
-        setPageMode('home');
-        return;
-      }
+        setPageMode("home");
+        setSelectedPlantId(null);
 
-      window.history.replaceState(createHistoryState('home', null), '');
+        window.history.replaceState(
+          createHistoryState("home"),
+          "",
+          window.location.href
+        );
+      }
     });
 
-    return () => unsubscribeAuth();
+    return () => unsubscribe();
   }, []);
 
   useEffect(() => {
     if (!user) return;
 
-    setPlantsLoading(true);
+    setIsPlantsLoading(true);
 
-    const unsubscribePlants = subscribePlants(
+    const unsubscribe = subscribePlants(
       user.uid,
       (nextPlants) => {
-        setPlants(Array.isArray(nextPlants) ? nextPlants : []);
-        setPlantsLoading(false);
+        setPlants(nextPlants);
+        setIsPlantsLoading(false);
       },
-      (error) => {
-        console.error(error);
-        setPlantsLoading(false);
-        alert('식물 정보를 불러오지 못했습니다.');
+      () => {
+        setIsPlantsLoading(false);
       }
     );
 
-    return () => unsubscribePlants();
+    return () => unsubscribe();
   }, [user]);
 
   useEffect(() => {
+    window.history.replaceState(
+      createHistoryState("home"),
+      "",
+      window.location.href
+    );
+
     const handlePopState = (event: PopStateEvent) => {
       const state = event.state as PlantStoryHistoryState | null;
 
-      if (!state || state.plantStory !== true || state.pageMode === 'home') {
-        setSelectedPlant(null);
-        setPageMode('home');
+      if (!state?.plantStory) {
+        setPageMode("home");
+        setSelectedPlantId(null);
         return;
       }
 
-      if (state.pageMode === 'add') {
-        setSelectedPlant(null);
-        setPageMode('add');
-        return;
-      }
-
-      const targetPlant = plants.find((plant) => plant.id === state.plantId);
-
-      if (!targetPlant) {
-        setSelectedPlant(null);
-        setPageMode('home');
-        window.history.replaceState(createHistoryState('home', null), '');
-        return;
-      }
-
-      setSelectedPlant(targetPlant);
       setPageMode(state.pageMode);
+      setSelectedPlantId(state.plantId);
     };
 
-    window.addEventListener('popstate', handlePopState);
+    window.addEventListener("popstate", handlePopState);
 
     return () => {
-      window.removeEventListener('popstate', handlePopState);
+      window.removeEventListener("popstate", handlePopState);
     };
-  }, [plants]);
-    const handleLogin = async () => {
-    try {
-      const provider = new GoogleAuthProvider();
-      await signInWithPopup(auth, provider);
-    } catch (error) {
-      console.error(error);
-      alert('Google 로그인에 실패했습니다.');
-    }
+  }, []);
+
+  const movePage = (nextPageMode: PageMode, plantId: string | null = null) => {
+    setPageMode(nextPageMode);
+    setSelectedPlantId(plantId);
+
+    window.history.pushState(
+      createHistoryState(nextPageMode, plantId),
+      "",
+      window.location.href
+    );
+  };
+
+  const replacePage = (
+    nextPageMode: PageMode,
+    plantId: string | null = null
+  ) => {
+    setPageMode(nextPageMode);
+    setSelectedPlantId(plantId);
+
+    window.history.replaceState(
+      createHistoryState(nextPageMode, plantId),
+      "",
+      window.location.href
+    );
+  };
+
+  const handleLogin = async () => {
+    const provider = new GoogleAuthProvider();
+    await signInWithPopup(auth, provider);
   };
 
   const handleLogout = async () => {
-    try {
-      await signOut(auth);
-    } catch (error) {
-      console.error(error);
-      alert('로그아웃에 실패했습니다.');
-    }
+    await signOut(auth);
   };
 
   const handleAddPlant = () => {
-    movePage('add', null);
+    movePage("add");
   };
 
   const handleSelectPlant = (plant: Plant) => {
-    movePage('detail', plant);
+    movePage("detail", plant.id);
   };
 
   const handleEditPlant = (plant: Plant) => {
-    movePage('edit', plant);
+    movePage("edit", plant.id);
   };
 
-  const handleCancel = () => {
-    window.history.back();
+  const handleBackToHome = () => {
+    movePage("home");
   };
 
-  const handleBackHome = () => {
-    window.history.back();
+  const handleBackToDetail = (plantId: string) => {
+    movePage("detail", plantId);
   };
 
-  const handleSavePlant = async (values: PlantFormValues) => {
-    if (!user) {
-      alert('로그인이 필요합니다.');
-      return;
-    }
+  const handleSaveNewPlant = async (values: PlantFormValues) => {
+    if (!user) return;
 
-    try {
-      if (pageMode === 'edit' && selectedPlant) {
-        await updatePlant(selectedPlant.id, values);
+    await createPlant(user.uid, values);
+    replacePage("home");
+  };
 
-        const updatedPlant = {
-          ...selectedPlant,
-          ...values,
-          updatedAt: new Date().toISOString(),
-        };
+  const handleSaveEditPlant = async (values: PlantFormValues) => {
+    if (!selectedPlantId) return;
 
-        movePage('detail', updatedPlant, 'replace');
-      } else {
-        await createPlant(user.uid, values);
-
-        movePage('home', null, 'replace');
-      }
-    } catch (error) {
-      console.error(error);
-      alert(
-        error instanceof Error
-          ? error.message
-          : '식물 정보를 저장하지 못했습니다.'
-      );
-    }
+    await updatePlant(selectedPlantId, values);
+    replacePage("detail", selectedPlantId);
   };
 
   const handleDeletePlant = async (plantId: string) => {
-    try {
-      await deletePlant(plantId);
-
-      movePage('home', null, 'replace');
-    } catch (error) {
-      console.error(error);
-      alert('식물을 삭제하지 못했습니다.');
-    }
+    await deletePlant(plantId);
+    replacePage("home");
   };
 
   const handleWaterPlant = async (plant: Plant) => {
-    try {
-      const today = getTodayString();
-
-      await updateWateredAt(plant.id, today);
-
-      setSelectedPlant({
-        ...plant,
-        lastWateredAt: today,
-        updatedAt: new Date().toISOString(),
-      });
-    } catch (error) {
-      console.error(error);
-      alert('물 준 날짜를 저장하지 못했습니다.');
-    }
+    await updateWateredAt(plant.id, getTodayString());
   };
 
   const handleFertilizePlant = async (plant: Plant) => {
-    try {
-      const today = getTodayString();
-
-      await updateFertilizedAt(plant.id, today);
-
-      setSelectedPlant({
-        ...plant,
-        lastFertilizedAt: today,
-        updatedAt: new Date().toISOString(),
-      });
-    } catch (error) {
-      console.error(error);
-      alert('영양제 준 날짜를 저장하지 못했습니다.');
-    }
+    await updateFertilizedAt(plant.id, getTodayString());
   };
 
-  if (authLoading) {
-    return (
-      <div className="app-loading">
-        <p>Plant Story를 준비하는 중입니다.</p>
-      </div>
-    );
+  if (isAuthLoading) {
+    return <div className="app-loading">불러오는 중...</div>;
   }
 
   if (!user) {
-    return (
-      <div className="login-page">
-        <section className="login-card">
-          <div className="login-icon" aria-hidden="true">
-            <svg
-              width="112"
-              height="112"
-              viewBox="0 0 96 96"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <rect x="32" y="58" width="32" height="22" rx="6" fill="#D9A066" />
-              <path
-                d="M48 61C48 44 48 35 48 23"
-                stroke="#4F8F62"
-                strokeWidth="5"
-                strokeLinecap="round"
-              />
-              <path
-                d="M46 39C31 38 23 30 22 18C35 18 45 25 46 39Z"
-                fill="#79B77B"
-              />
-              <path
-                d="M50 45C66 44 75 35 76 22C61 22 51 30 50 45Z"
-                fill="#67A96B"
-              />
-              <path
-                d="M47 54C34 54 26 47 25 36C38 36 46 42 47 54Z"
-                fill="#8BCB8E"
-              />
-            </svg>
-          </div>
-
-          <h1>Plant Story</h1>
-          <p>나의 식물 관리 기록을 안전하게 저장하세요.</p>
-
-          <button
-            type="button"
-            className="google-login-button"
-            onClick={handleLogin}
-          >
-            Google로 시작하기
-          </button>
-        </section>
-      </div>
-    );
+   if (!user) {
+  return <Login />;
+}
   }
 
-  if (pageMode === 'add') {
+  if (pageMode === "add") {
     return (
       <AddEditPlant
-        plant={null}
-        onSave={handleSavePlant}
-        onCancel={handleCancel}
+        onSave={handleSaveNewPlant}
+        onCancel={handleBackToHome}
       />
     );
   }
 
-  if (pageMode === 'edit' && selectedPlant) {
+  if (pageMode === "edit") {
     return (
       <AddEditPlant
         plant={selectedPlant}
-        onSave={handleSavePlant}
-        onCancel={handleCancel}
+        onSave={handleSaveEditPlant}
+        onCancel={() => {
+          if (selectedPlantId) {
+            handleBackToDetail(selectedPlantId);
+            return;
+          }
+
+          handleBackToHome();
+        }}
       />
     );
   }
 
-  if (pageMode === 'detail' && selectedPlant) {
+  if (pageMode === "detail") {
+    if (!selectedPlant) {
+      return (
+        <Home
+          plants={plants}
+          loading={isPlantsLoading}
+          onLogout={handleLogout}
+          onAddPlant={handleAddPlant}
+          onSelectPlant={handleSelectPlant}
+        />
+      );
+    }
+
     return (
       <PlantDetail
         plant={selectedPlant}
-        onBack={handleBackHome}
+        onBack={handleBackToHome}
         onEdit={handleEditPlant}
         onDelete={handleDeletePlant}
         onWater={handleWaterPlant}
@@ -364,10 +275,10 @@ function App() {
   return (
     <Home
       plants={plants}
-      loading={plantsLoading}
+      loading={isPlantsLoading}
+      onLogout={handleLogout}
       onAddPlant={handleAddPlant}
       onSelectPlant={handleSelectPlant}
-      onLogout={handleLogout}
     />
   );
 }
