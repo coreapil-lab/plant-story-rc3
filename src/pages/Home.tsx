@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import type { Plant } from '../types/plant';
 import PlantCard from '../components/PlantCard';
-
+import "./Home.css";
 type HomeProps = {
   plants: Plant[];
   loading: boolean;
@@ -46,6 +46,7 @@ function Home({
         <input
           value={searchText}
           onChange={(e) => setSearchText(e.target.value)}
+          className="search-input"
           placeholder="검색"
         />
       </div>
