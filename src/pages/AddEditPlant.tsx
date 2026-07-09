@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
+import ImageUploader from "../components/ImageUploader";
+import { uploadPlantImage } from "../services/cloudinary";
 import type { Plant, PlantFormValues } from "../types/plant";
 import "./AddEditPlant.css";
 
@@ -24,6 +26,7 @@ const emptyForm: PlantFormValues = {
 function AddEditPlant({ plant, onSave, onCancel }: AddEditPlantProps) {
   const [form, setForm] = useState<PlantFormValues>(emptyForm);
   const [saving, setSaving] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   useEffect(() => {
     if (!plant) {
@@ -58,11 +61,34 @@ function AddEditPlant({ plant, onSave, onCancel }: AddEditPlantProps) {
     }));
   };
 
+  const handleImageUpload = async (file: File) => {
+    setUploadingImage(true);
+
+    try {
+      const imageUrl = await uploadPlantImage(file);
+
+      setForm((prev) => ({
+        ...prev,
+        imageUrl,
+      }));
+    } catch (error) {
+      console.error(error);
+      alert("사진 업로드에 실패했습니다. 다시 시도해 주세요.");
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
     if (!form.name.trim()) {
       alert("식물 이름을 입력해 주세요.");
+      return;
+    }
+
+    if (uploadingImage) {
+      alert("사진 업로드가 끝난 후 저장해 주세요.");
       return;
     }
 
@@ -93,7 +119,11 @@ function AddEditPlant({ plant, onSave, onCancel }: AddEditPlantProps) {
             취소
           </button>
 
-          <button type="submit" className="top-button" disabled={saving}>
+          <button
+            type="submit"
+            className="top-button"
+            disabled={saving || uploadingImage}
+          >
             {saving ? "저장 중" : "저장"}
           </button>
         </header>
@@ -105,6 +135,12 @@ function AddEditPlant({ plant, onSave, onCancel }: AddEditPlantProps) {
             {plant ? "식물 기록을 수정하세요." : "새로운 식물을 등록하세요."}
           </p>
         </section>
+
+        <ImageUploader
+          imageUrl={form.imageUrl}
+          uploading={uploadingImage}
+          onUpload={handleImageUpload}
+        />
 
         <section className="form-card">
           <div className="form-group">
@@ -204,8 +240,12 @@ function AddEditPlant({ plant, onSave, onCancel }: AddEditPlantProps) {
         </section>
 
         <div className="button-row">
-          <button type="submit" className="primary-button" disabled={saving}>
-            {saving ? "저장 중" : "저장하기"}
+          <button
+            type="submit"
+            className="primary-button"
+            disabled={saving || uploadingImage}
+          >
+            {uploadingImage ? "사진 업로드 중" : saving ? "저장 중" : "저장하기"}
           </button>
         </div>
       </form>
