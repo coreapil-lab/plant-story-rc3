@@ -18,6 +18,7 @@ const emptyForm: PlantFormValues = {
   lastFertilizedAt: "",
   fertilizingIntervalDays: 30,
   memo: "",
+  imageUrl: "",
 };
 
 function AddEditPlant({ plant, onSave, onCancel }: AddEditPlantProps) {
@@ -39,6 +40,7 @@ function AddEditPlant({ plant, onSave, onCancel }: AddEditPlantProps) {
       lastFertilizedAt: plant.lastFertilizedAt ?? "",
       fertilizingIntervalDays: plant.fertilizingIntervalDays ?? 30,
       memo: plant.memo ?? "",
+      imageUrl: plant.imageUrl ?? "",
     });
   }, [plant]);
 
@@ -76,6 +78,7 @@ function AddEditPlant({ plant, onSave, onCancel }: AddEditPlantProps) {
         lastFertilizedAt: form.lastFertilizedAt,
         fertilizingIntervalDays: form.fertilizingIntervalDays,
         memo: form.memo.trim(),
+        imageUrl: form.imageUrl.trim(),
       });
     } finally {
       setSaving(false);

@@ -7,6 +7,8 @@ export interface Plant {
   name: string;
   nickname: string;
 
+  imageUrl: string;
+
   adoptedAt: string;
 
   lastWateredAt: string;
@@ -24,6 +26,8 @@ export interface Plant {
 export interface PlantFormValues {
   name: string;
   nickname: string;
+
+  imageUrl: string;
 
   adoptedAt: string;
 

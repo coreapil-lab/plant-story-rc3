@@ -35,6 +35,8 @@ export function mapPlantDocument(id: string, data: DocumentData): Plant {
     name: normalizeString(data.name),
     nickname: normalizeString(data.nickname),
 
+    imageUrl: normalizeString(data.imageUrl),
+
     adoptedAt: normalizeString(data.adoptedAt),
 
     lastWateredAt: normalizeString(data.lastWateredAt),
@@ -84,6 +86,8 @@ export async function createPlant(
     name: values.name,
     nickname: values.nickname,
 
+    imageUrl: values.imageUrl,
+
     adoptedAt: values.adoptedAt,
 
     lastWateredAt: values.lastWateredAt,
@@ -111,6 +115,8 @@ export async function updatePlant(
   await updateDoc(doc(db, COLLECTION_NAME, plantId), {
     name: values.name,
     nickname: values.nickname,
+
+    imageUrl: values.imageUrl,
 
     adoptedAt: values.adoptedAt,
 
