@@ -1,4 +1,5 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
+import type { TouchEvent } from "react";
 import type { Plant } from "../types/plant";
 import "./PlantDetail.css";
 
@@ -123,6 +124,8 @@ function PlantDetail({
     getMonthStart(getTodayString())
   );
   const [savingDate, setSavingDate] = useState(false);
+  const touchStartX = useRef<number | null>(null);
+  const touchCurrentX = useRef<number | null>(null);
 
   const calendarDays = useMemo(
     () => createCalendarDays(calendarMonth),
@@ -167,10 +170,55 @@ function PlantDetail({
   };
 
   const moveCalendarMonth = (offset: number) => {
-    setCalendarMonth(
-      (current) =>
-        new Date(current.getFullYear(), current.getMonth() + offset, 1)
-    );
+    setCalendarMonth((current) => {
+      const nextMonth = new Date(
+        current.getFullYear(),
+        current.getMonth() + offset,
+        1
+      );
+
+      if (nextMonth.getTime() > todayMonth.getTime()) {
+        return current;
+      }
+
+      return nextMonth;
+    });
+  };
+
+  const handleCalendarTouchStart = (
+    event: TouchEvent<HTMLDivElement>
+  ) => {
+    const startX = event.touches[0]?.clientX ?? null;
+
+    touchStartX.current = startX;
+    touchCurrentX.current = startX;
+  };
+
+  const handleCalendarTouchMove = (
+    event: TouchEvent<HTMLDivElement>
+  ) => {
+    touchCurrentX.current = event.touches[0]?.clientX ?? null;
+  };
+
+  const handleCalendarTouchEnd = () => {
+    if (
+      touchStartX.current === null ||
+      touchCurrentX.current === null
+    ) {
+      return;
+    }
+
+    const distance = touchCurrentX.current - touchStartX.current;
+    const swipeThreshold = 48;
+
+    if (distance > swipeThreshold) {
+      moveCalendarMonth(-1);
+    } else if (distance < -swipeThreshold && !isNextMonthDisabled) {
+      moveCalendarMonth(1);
+    }
+
+    touchStartX.current = null;
+    touchCurrentX.current = null;
   };
 
   const handleConfirmDate = async () => {
@@ -382,7 +430,12 @@ function PlantDetail({
               날짜를 선택해 주세요.
             </p>
 
-            <div className="pd-calendar">
+            <div
+              className="pd-calendar"
+              onTouchStart={handleCalendarTouchStart}
+              onTouchMove={handleCalendarTouchMove}
+              onTouchEnd={handleCalendarTouchEnd}
+            >
               <div className="pd-calendar-header">
                 <button
                   type="button"

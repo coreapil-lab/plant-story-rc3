@@ -297,6 +297,7 @@
 .pd-calendar {
   width: 100%;
   padding: 16px 12px 14px;
+  touch-action: pan-y;
   border-radius: 20px;
   background: #f7f8f5;
   box-sizing: border-box;
@@ -435,11 +436,13 @@
 }
 
 .pd-calendar-dot-water {
-  background: #5b9bd5;
+  background: #1976d2;
+  box-shadow: 0 0 0 1px rgba(25, 118, 210, 0.14);
 }
 
 .pd-calendar-dot-fertilizer {
-  background: #6aa66a;
+  background: #43a047;
+  box-shadow: 0 0 0 1px rgba(67, 160, 71, 0.14);
 }
 
 .pd-calendar-legend {
