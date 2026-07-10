@@ -1,16 +1,28 @@
+import { useState } from "react";
 import type { Plant } from "../types/plant";
 import "./PlantDetail.css";
+
+type DateAction = "water" | "fertilizer";
 
 type PlantDetailProps = {
   plant: Plant;
   onBack: () => void;
   onEdit: (plant: Plant) => void;
   onDelete: (plantId: string) => Promise<void>;
-  onWater: (plant: Plant) => Promise<void>;
-  onFertilize: (plant: Plant) => Promise<void>;
+  onWater: (plant: Plant, date: string) => Promise<void>;
+  onFertilize: (plant: Plant, date: string) => Promise<void>;
 };
 
 const MS_PER_DAY = 1000 * 60 * 60 * 24;
+
+function getTodayString() {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, "0");
+  const date = String(today.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${date}`;
+}
 
 function getDaysFrom(dateString: string) {
   if (!dateString) return null;
@@ -55,19 +67,53 @@ function PlantDetail({
   onFertilize,
 }: PlantDetailProps) {
   const adoptedDays = getDaysFrom(plant.adoptedAt);
+  const [dateAction, setDateAction] = useState<DateAction | null>(null);
+  const [selectedDate, setSelectedDate] = useState(getTodayString());
+  const [savingDate, setSavingDate] = useState(false);
 
   const handleDelete = async () => {
     if (!window.confirm("정말 삭제할까요?")) return;
 
     if (
       !window.confirm(
-        "삭제하면 복구할 수 없습니다. 그래도 삭제할까요?",
+        "삭제하면 복구할 수 없습니다. 그래도 삭제할까요?"
       )
     ) {
       return;
     }
 
     await onDelete(plant.id);
+  };
+
+  const openDatePicker = (action: DateAction) => {
+    setSelectedDate(getTodayString());
+    setDateAction(action);
+  };
+
+  const closeDatePicker = () => {
+    if (savingDate) return;
+
+    setDateAction(null);
+    setSelectedDate(getTodayString());
+  };
+
+  const handleConfirmDate = async () => {
+    if (!dateAction || !selectedDate) return;
+
+    setSavingDate(true);
+
+    try {
+      if (dateAction === "water") {
+        await onWater(plant, selectedDate);
+      } else {
+        await onFertilize(plant, selectedDate);
+      }
+
+      setDateAction(null);
+      setSelectedDate(getTodayString());
+    } finally {
+      setSavingDate(false);
+    }
   };
 
   return (
@@ -147,19 +193,13 @@ function PlantDetail({
 
           <div className="pd-profile-info">
             <div className="pd-profile-field">
-              <span className="pd-profile-label">
-                식물 이름
-              </span>
+              <span className="pd-profile-label">식물 이름</span>
 
-              <h1 className="pd-profile-name">
-                {plant.name}
-              </h1>
+              <h1 className="pd-profile-name">{plant.name}</h1>
             </div>
 
             <div className="pd-profile-field">
-              <span className="pd-profile-label">
-                별명
-              </span>
+              <span className="pd-profile-label">별명</span>
 
               <p className="pd-profile-value">
                 {plant.nickname || "별명 없음"}
@@ -224,17 +264,17 @@ function PlantDetail({
           <button
             type="button"
             className="pd-action-button pd-water-button"
-            onClick={() => onWater(plant)}
+            onClick={() => openDatePicker("water")}
           >
-            💧 오늘 물 줬어요
+            💧 물 준 날짜 기록
           </button>
 
           <button
             type="button"
             className="pd-action-button pd-fertilizer-button"
-            onClick={() => onFertilize(plant)}
+            onClick={() => openDatePicker("fertilizer")}
           >
-            🌱 오늘 영양제 줬어요
+            🌱 영양제 날짜 기록
           </button>
 
           <button
@@ -246,6 +286,64 @@ function PlantDetail({
           </button>
         </div>
       </main>
+
+      {dateAction && (
+        <div
+          className="pd-date-modal-backdrop"
+          role="presentation"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) {
+              closeDatePicker();
+            }
+          }}
+        >
+          <section
+            className="pd-date-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="pd-date-modal-title"
+          >
+            <h2 id="pd-date-modal-title" className="pd-date-modal-title">
+              {dateAction === "water"
+                ? "물 준 날짜"
+                : "영양제 준 날짜"}
+            </h2>
+
+            <p className="pd-date-modal-description">
+              날짜를 선택해 주세요.
+            </p>
+
+            <input
+              className="pd-date-input"
+              type="date"
+              value={selectedDate}
+              max={getTodayString()}
+              onChange={(event) => setSelectedDate(event.target.value)}
+              disabled={savingDate}
+            />
+
+            <div className="pd-date-modal-actions">
+              <button
+                type="button"
+                className="pd-date-modal-button pd-date-cancel-button"
+                onClick={closeDatePicker}
+                disabled={savingDate}
+              >
+                취소
+              </button>
+
+              <button
+                type="button"
+                className="pd-date-modal-button pd-date-confirm-button"
+                onClick={handleConfirmDate}
+                disabled={savingDate || !selectedDate}
+              >
+                {savingDate ? "처리 중" : "확인"}
+              </button>
+            </div>
+          </section>
+        </div>
+      )}
     </div>
   );
 }

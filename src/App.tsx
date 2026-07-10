@@ -33,14 +33,6 @@ type PlantStoryHistoryState = {
   plantId: string | null;
 };
 
-function getTodayString() {
-  const today = new Date();
-  const year = today.getFullYear();
-  const month = String(today.getMonth() + 1).padStart(2, "0");
-  const date = String(today.getDate()).padStart(2, "0");
-  return `${year}-${month}-${date}`;
-}
-
 function createHistoryState(
   pageMode: PageMode,
   plantId: string | null = null
@@ -203,12 +195,12 @@ function App() {
     replacePage("home");
   };
 
-  const handleWaterPlant = async (plant: Plant) => {
-    await updateWateredAt(plant.id, getTodayString());
+  const handleWaterPlant = async (plant: Plant, date: string) => {
+    await updateWateredAt(plant.id, date);
   };
 
-  const handleFertilizePlant = async (plant: Plant) => {
-    await updateFertilizedAt(plant.id, getTodayString());
+  const handleFertilizePlant = async (plant: Plant, date: string) => {
+    await updateFertilizedAt(plant.id, date);
   };
 
   if (isAuthLoading) {
@@ -216,9 +208,7 @@ function App() {
   }
 
   if (!user) {
-   if (!user) {
-  return <Login />;
-}
+    return <Login />;
   }
 
   if (pageMode === "add") {

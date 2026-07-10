@@ -276,6 +276,114 @@
   color: #cf4f4b;
 }
 
+.pd-date-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding:
+    18px
+    18px
+    calc(18px + env(safe-area-inset-bottom));
+  background: rgba(23, 42, 28, 0.38);
+  box-sizing: border-box;
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+
+.pd-date-modal {
+  width: min(100%, 520px);
+  padding: 24px 20px 20px;
+  border: 1px solid rgba(99, 145, 89, 0.16);
+  border-radius: 24px;
+  background: #ffffff;
+  box-shadow: 0 24px 60px rgba(27, 61, 37, 0.22);
+  box-sizing: border-box;
+}
+
+.pd-date-modal-title {
+  margin: 0;
+  color: #173d25;
+  font-size: 22px;
+  font-weight: 950;
+  line-height: 1.3;
+  letter-spacing: -0.45px;
+}
+
+.pd-date-modal-description {
+  margin: 7px 0 18px;
+  color: #718075;
+  font-size: 14px;
+  font-weight: 750;
+}
+
+.pd-date-input {
+  width: 100%;
+  min-height: 54px;
+  padding: 0 14px;
+  border: 1px solid rgba(104, 153, 91, 0.22);
+  border-radius: 15px;
+  outline: none;
+  background: #f4faf1;
+  color: #173d25;
+  font: inherit;
+  font-size: 17px;
+  font-weight: 900;
+  box-sizing: border-box;
+}
+
+.pd-date-input:focus {
+  border-color: rgba(87, 162, 92, 0.52);
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(105, 180, 110, 0.14);
+}
+
+.pd-date-modal-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.pd-date-modal-button {
+  min-height: 52px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 16px;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 950;
+  cursor: pointer;
+}
+
+.pd-date-modal-button:disabled {
+  opacity: 0.58;
+  cursor: not-allowed;
+}
+
+.pd-date-cancel-button {
+  border: 1px solid rgba(99, 145, 89, 0.15);
+  background: #f3f7f1;
+  color: #49604e;
+}
+
+.pd-date-confirm-button {
+  background: linear-gradient(
+    135deg,
+    #79c987,
+    #64b574
+  );
+  color: #ffffff;
+}
+
+@media (min-width: 600px) {
+  .pd-date-modal-backdrop {
+    align-items: center;
+  }
+}
+
 @media (max-width: 480px) {
   .pd-profile {
     grid-template-columns:
@@ -338,6 +446,18 @@
 
   .pd-section-title {
     font-size: 22px;
+  }
+
+  .pd-date-modal-backdrop {
+    padding:
+      12px
+      12px
+      calc(12px + env(safe-area-inset-bottom));
+  }
+
+  .pd-date-modal {
+    padding: 22px 16px 16px;
+    border-radius: 22px;
   }
 }
 
