@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import type { Plant } from "../types/plant";
 import "./PlantDetail.css";
 
@@ -13,26 +13,45 @@ type PlantDetailProps = {
   onFertilize: (plant: Plant, date: string) => Promise<void>;
 };
 
+type CalendarDay = {
+  dateString: string;
+  dayNumber: number;
+  isCurrentMonth: boolean;
+  isFuture: boolean;
+};
+
 const MS_PER_DAY = 1000 * 60 * 60 * 24;
+const WEEKDAY_LABELS = ["일", "월", "화", "수", "목", "금", "토"];
+
+function getDateString(date: Date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+}
 
 function getTodayString() {
-  const today = new Date();
-  const year = today.getFullYear();
-  const month = String(today.getMonth() + 1).padStart(2, "0");
-  const date = String(today.getDate()).padStart(2, "0");
+  return getDateString(new Date());
+}
 
-  return `${year}-${month}-${date}`;
+function parseDateString(dateString: string) {
+  const [year, month, day] = dateString.split("-").map(Number);
+
+  if (!year || !month || !day) return null;
+
+  const date = new Date(year, month - 1, day);
+  date.setHours(0, 0, 0, 0);
+
+  return Number.isNaN(date.getTime()) ? null : date;
 }
 
 function getDaysFrom(dateString: string) {
-  if (!dateString) return null;
+  const target = parseDateString(dateString);
 
-  const target = new Date(dateString);
+  if (!target) return null;
+
   const today = new Date();
-
-  if (Number.isNaN(target.getTime())) return null;
-
-  target.setHours(0, 0, 0, 0);
   today.setHours(0, 0, 0, 0);
 
   return Math.floor((today.getTime() - target.getTime()) / MS_PER_DAY);
@@ -45,16 +64,47 @@ function formatDPlus(days: number | null) {
 }
 
 function formatDate(dateString: string) {
-  if (!dateString) return "기록 없음";
+  const date = parseDateString(dateString);
 
-  const date = new Date(dateString);
-
-  if (Number.isNaN(date.getTime())) return "기록 없음";
+  if (!date) return "기록 없음";
 
   return date.toLocaleDateString("ko-KR", {
     year: "2-digit",
     month: "numeric",
     day: "numeric",
+  });
+}
+
+function getMonthStart(dateString: string) {
+  const date = parseDateString(dateString) ?? new Date();
+
+  return new Date(date.getFullYear(), date.getMonth(), 1);
+}
+
+function createCalendarDays(monthStart: Date): CalendarDay[] {
+  const firstDay = new Date(
+    monthStart.getFullYear(),
+    monthStart.getMonth(),
+    1
+  );
+  const gridStart = new Date(firstDay);
+  gridStart.setDate(firstDay.getDate() - firstDay.getDay());
+
+  const today = parseDateString(getTodayString()) as Date;
+
+  return Array.from({ length: 42 }, (_, index) => {
+    const date = new Date(gridStart);
+    date.setDate(gridStart.getDate() + index);
+    date.setHours(0, 0, 0, 0);
+
+    return {
+      dateString: getDateString(date),
+      dayNumber: date.getDate(),
+      isCurrentMonth:
+        date.getMonth() === monthStart.getMonth() &&
+        date.getFullYear() === monthStart.getFullYear(),
+      isFuture: date.getTime() > today.getTime(),
+    };
   });
 }
 
@@ -69,7 +119,20 @@ function PlantDetail({
   const adoptedDays = getDaysFrom(plant.adoptedAt);
   const [dateAction, setDateAction] = useState<DateAction | null>(null);
   const [selectedDate, setSelectedDate] = useState(getTodayString());
+  const [calendarMonth, setCalendarMonth] = useState(
+    getMonthStart(getTodayString())
+  );
   const [savingDate, setSavingDate] = useState(false);
+
+  const calendarDays = useMemo(
+    () => createCalendarDays(calendarMonth),
+    [calendarMonth]
+  );
+
+  const todayMonth = getMonthStart(getTodayString());
+  const isNextMonthDisabled =
+    calendarMonth.getFullYear() === todayMonth.getFullYear() &&
+    calendarMonth.getMonth() === todayMonth.getMonth();
 
   const handleDelete = async () => {
     if (!window.confirm("정말 삭제할까요?")) return;
@@ -86,15 +149,28 @@ function PlantDetail({
   };
 
   const openDatePicker = (action: DateAction) => {
-    setSelectedDate(getTodayString());
+    const today = getTodayString();
+
+    setSelectedDate(today);
+    setCalendarMonth(getMonthStart(today));
     setDateAction(action);
   };
 
   const closeDatePicker = () => {
     if (savingDate) return;
 
+    const today = getTodayString();
+
     setDateAction(null);
-    setSelectedDate(getTodayString());
+    setSelectedDate(today);
+    setCalendarMonth(getMonthStart(today));
+  };
+
+  const moveCalendarMonth = (offset: number) => {
+    setCalendarMonth(
+      (current) =>
+        new Date(current.getFullYear(), current.getMonth() + offset, 1)
+    );
   };
 
   const handleConfirmDate = async () => {
@@ -109,8 +185,11 @@ function PlantDetail({
         await onFertilize(plant, selectedDate);
       }
 
+      const today = getTodayString();
+
       setDateAction(null);
-      setSelectedDate(getTodayString());
+      setSelectedDate(today);
+      setCalendarMonth(getMonthStart(today));
     } finally {
       setSavingDate(false);
     }
@@ -163,24 +242,20 @@ function PlantDetail({
                       rx="6"
                       fill="#D9A066"
                     />
-
                     <path
                       d="M48 61C48 44 48 35 48 23"
                       stroke="#4F8F62"
                       strokeWidth="5"
                       strokeLinecap="round"
                     />
-
                     <path
                       d="M46 39C31 38 23 30 22 18C35 18 45 25 46 39Z"
                       fill="#79B77B"
                     />
-
                     <path
                       d="M50 45C66 44 75 35 76 22C61 22 51 30 50 45Z"
                       fill="#67A96B"
                     />
-
                     <path
                       d="M47 54C34 54 26 47 25 36C38 36 46 42 47 54Z"
                       fill="#8BCB8E"
@@ -194,13 +269,11 @@ function PlantDetail({
           <div className="pd-profile-info">
             <div className="pd-profile-field">
               <span className="pd-profile-label">식물 이름</span>
-
               <h1 className="pd-profile-name">{plant.name}</h1>
             </div>
 
             <div className="pd-profile-field">
               <span className="pd-profile-label">별명</span>
-
               <p className="pd-profile-value">
                 {plant.nickname || "별명 없음"}
               </p>
@@ -217,7 +290,6 @@ function PlantDetail({
                 <span aria-hidden="true">📅</span>
                 입양일
               </span>
-
               <span className="pd-info-value">
                 {formatDate(plant.adoptedAt)} /{" "}
                 {formatDPlus(adoptedDays)}
@@ -229,7 +301,6 @@ function PlantDetail({
                 <span aria-hidden="true">💧</span>
                 최근 물 준 날
               </span>
-
               <span className="pd-info-value">
                 {formatDate(plant.lastWateredAt)} /{" "}
                 {plant.wateringIntervalDays}일 주기
@@ -241,7 +312,6 @@ function PlantDetail({
                 <span aria-hidden="true">🌱</span>
                 최근 영양제
               </span>
-
               <span className="pd-info-value">
                 {formatDate(plant.lastFertilizedAt)} /{" "}
                 {plant.fertilizingIntervalDays}일 주기
@@ -252,7 +322,6 @@ function PlantDetail({
 
         <section className="pd-section">
           <h2 className="pd-section-title">메모</h2>
-
           <p className="pd-memo">
             {plant.memo
               ? plant.memo
@@ -313,14 +382,109 @@ function PlantDetail({
               날짜를 선택해 주세요.
             </p>
 
-            <input
-              className="pd-date-input"
-              type="date"
-              value={selectedDate}
-              max={getTodayString()}
-              onChange={(event) => setSelectedDate(event.target.value)}
-              disabled={savingDate}
-            />
+            <div className="pd-calendar">
+              <div className="pd-calendar-header">
+                <button
+                  type="button"
+                  className="pd-calendar-nav-button"
+                  onClick={() => moveCalendarMonth(-1)}
+                  aria-label="이전 달"
+                  disabled={savingDate}
+                >
+                  ‹
+                </button>
+
+                <strong className="pd-calendar-month">
+                  {calendarMonth.getFullYear()}년{" "}
+                  {calendarMonth.getMonth() + 1}월
+                </strong>
+
+                <button
+                  type="button"
+                  className="pd-calendar-nav-button"
+                  onClick={() => moveCalendarMonth(1)}
+                  aria-label="다음 달"
+                  disabled={savingDate || isNextMonthDisabled}
+                >
+                  ›
+                </button>
+              </div>
+
+              <div className="pd-calendar-weekdays">
+                {WEEKDAY_LABELS.map((label) => (
+                  <span key={label}>{label}</span>
+                ))}
+              </div>
+
+              <div className="pd-calendar-grid">
+                {calendarDays.map((day) => {
+                  const isSelected = selectedDate === day.dateString;
+                  const isWatered =
+                    plant.lastWateredAt === day.dateString;
+                  const isFertilized =
+                    plant.lastFertilizedAt === day.dateString;
+                  const isDisabled =
+                    !day.isCurrentMonth || day.isFuture || savingDate;
+
+                  return (
+                    <button
+                      key={day.dateString}
+                      type="button"
+                      className={[
+                        "pd-calendar-day",
+                        !day.isCurrentMonth
+                          ? "pd-calendar-day-outside"
+                          : "",
+                        day.isFuture
+                          ? "pd-calendar-day-future"
+                          : "",
+                        isSelected
+                          ? "pd-calendar-day-selected"
+                          : "",
+                      ]
+                        .filter(Boolean)
+                        .join(" ")}
+                      onClick={() => setSelectedDate(day.dateString)}
+                      disabled={isDisabled}
+                      aria-label={`${day.dateString}${
+                        isWatered ? ", 물 준 날" : ""
+                      }${isFertilized ? ", 영양제 준 날" : ""}`}
+                    >
+                      <span className="pd-calendar-day-number">
+                        {day.dayNumber}
+                      </span>
+
+                      <span className="pd-calendar-day-dots">
+                        {isWatered && (
+                          <span
+                            className="pd-calendar-dot pd-calendar-dot-water"
+                            aria-hidden="true"
+                          />
+                        )}
+
+                        {isFertilized && (
+                          <span
+                            className="pd-calendar-dot pd-calendar-dot-fertilizer"
+                            aria-hidden="true"
+                          />
+                        )}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              <div className="pd-calendar-legend">
+                <span>
+                  <i className="pd-calendar-dot pd-calendar-dot-water" />
+                  물 준 날
+                </span>
+                <span>
+                  <i className="pd-calendar-dot pd-calendar-dot-fertilizer" />
+                  영양제 준 날
+                </span>
+              </div>
+            </div>
 
             <div className="pd-date-modal-actions">
               <button
