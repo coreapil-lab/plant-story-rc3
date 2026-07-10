@@ -3,6 +3,7 @@ import {
   collection,
   deleteDoc,
   doc,
+  getDoc,
   onSnapshot,
   query,
   serverTimestamp,
@@ -27,7 +28,43 @@ function normalizeNumber(value: unknown, fallback: number): number {
     : fallback;
 }
 
+function normalizeDateHistory(
+  value: unknown,
+  fallbackDate: string
+): string[] {
+  const history = Array.isArray(value)
+    ? value.filter(
+        (item): item is string =>
+          typeof item === "string" && item.trim().length > 0
+      )
+    : [];
+
+  if (fallbackDate) {
+    history.push(fallbackDate);
+  }
+
+  return [...new Set(history)].sort((a, b) => a.localeCompare(b));
+}
+
+function getLatestDate(history: string[], fallbackDate: string): string {
+  if (history.length === 0) return fallbackDate;
+
+  return history[history.length - 1];
+}
+
 export function mapPlantDocument(id: string, data: DocumentData): Plant {
+  const storedLastWateredAt = normalizeString(data.lastWateredAt);
+  const storedLastFertilizedAt = normalizeString(data.lastFertilizedAt);
+
+  const wateringHistory = normalizeDateHistory(
+    data.wateringHistory,
+    storedLastWateredAt
+  );
+  const fertilizingHistory = normalizeDateHistory(
+    data.fertilizingHistory,
+    storedLastFertilizedAt
+  );
+
   return {
     id,
     userId: normalizeString(data.userId),
@@ -39,11 +76,25 @@ export function mapPlantDocument(id: string, data: DocumentData): Plant {
 
     adoptedAt: normalizeString(data.adoptedAt),
 
-    lastWateredAt: normalizeString(data.lastWateredAt),
-    wateringIntervalDays: normalizeNumber(data.wateringIntervalDays, 7),
+    lastWateredAt: getLatestDate(
+      wateringHistory,
+      storedLastWateredAt
+    ),
+    wateringHistory,
+    wateringIntervalDays: normalizeNumber(
+      data.wateringIntervalDays,
+      7
+    ),
 
-    lastFertilizedAt: normalizeString(data.lastFertilizedAt),
-    fertilizingIntervalDays: normalizeNumber(data.fertilizingIntervalDays, 30),
+    lastFertilizedAt: getLatestDate(
+      fertilizingHistory,
+      storedLastFertilizedAt
+    ),
+    fertilizingHistory,
+    fertilizingIntervalDays: normalizeNumber(
+      data.fertilizingIntervalDays,
+      30
+    ),
 
     memo: normalizeString(data.memo),
 
@@ -57,7 +108,10 @@ export function subscribePlants(
   onChange: (plants: Plant[]) => void,
   onError: (error: Error) => void
 ) {
-  const q = query(collection(db, COLLECTION_NAME), where("userId", "==", userId));
+  const q = query(
+    collection(db, COLLECTION_NAME),
+    where("userId", "==", userId)
+  );
 
   return onSnapshot(
     q,
@@ -79,6 +133,12 @@ export async function createPlant(
   values: PlantFormValues
 ): Promise<void> {
   const now = new Date().toISOString();
+  const wateringHistory = values.lastWateredAt
+    ? [values.lastWateredAt]
+    : [];
+  const fertilizingHistory = values.lastFertilizedAt
+    ? [values.lastFertilizedAt]
+    : [];
 
   await addDoc(collection(db, COLLECTION_NAME), {
     userId,
@@ -91,9 +151,11 @@ export async function createPlant(
     adoptedAt: values.adoptedAt,
 
     lastWateredAt: values.lastWateredAt,
+    wateringHistory,
     wateringIntervalDays: values.wateringIntervalDays,
 
     lastFertilizedAt: values.lastFertilizedAt,
+    fertilizingHistory,
     fertilizingIntervalDays: values.fertilizingIntervalDays,
 
     memo: values.memo,
@@ -111,8 +173,29 @@ export async function updatePlant(
   values: PlantFormValues
 ): Promise<void> {
   const now = new Date().toISOString();
+  const plantRef = doc(db, COLLECTION_NAME, plantId);
+  const snapshot = await getDoc(plantRef);
+  const currentData = snapshot.data();
 
-  await updateDoc(doc(db, COLLECTION_NAME, plantId), {
+  const currentWateringHistory = normalizeDateHistory(
+    currentData?.wateringHistory,
+    normalizeString(currentData?.lastWateredAt)
+  );
+  const currentFertilizingHistory = normalizeDateHistory(
+    currentData?.fertilizingHistory,
+    normalizeString(currentData?.lastFertilizedAt)
+  );
+
+  const wateringHistory = normalizeDateHistory(
+    currentWateringHistory,
+    values.lastWateredAt
+  );
+  const fertilizingHistory = normalizeDateHistory(
+    currentFertilizingHistory,
+    values.lastFertilizedAt
+  );
+
+  await updateDoc(plantRef, {
     name: values.name,
     nickname: values.nickname,
 
@@ -121,9 +204,11 @@ export async function updatePlant(
     adoptedAt: values.adoptedAt,
 
     lastWateredAt: values.lastWateredAt,
+    wateringHistory,
     wateringIntervalDays: values.wateringIntervalDays,
 
     lastFertilizedAt: values.lastFertilizedAt,
+    fertilizingHistory,
     fertilizingIntervalDays: values.fertilizingIntervalDays,
 
     memo: values.memo,
@@ -138,9 +223,20 @@ export async function updateWateredAt(
   date: string
 ): Promise<void> {
   const now = new Date().toISOString();
+  const plantRef = doc(db, COLLECTION_NAME, plantId);
+  const snapshot = await getDoc(plantRef);
+  const currentData = snapshot.data();
 
-  await updateDoc(doc(db, COLLECTION_NAME, plantId), {
-    lastWateredAt: date,
+  const wateringHistory = normalizeDateHistory(
+    currentData?.wateringHistory,
+    normalizeString(currentData?.lastWateredAt)
+  );
+  const nextHistory = normalizeDateHistory(wateringHistory, date);
+  const latestDate = getLatestDate(nextHistory, date);
+
+  await updateDoc(plantRef, {
+    lastWateredAt: latestDate,
+    wateringHistory: nextHistory,
     updatedAt: now,
     serverUpdatedAt: serverTimestamp(),
   });
@@ -151,9 +247,20 @@ export async function updateFertilizedAt(
   date: string
 ): Promise<void> {
   const now = new Date().toISOString();
+  const plantRef = doc(db, COLLECTION_NAME, plantId);
+  const snapshot = await getDoc(plantRef);
+  const currentData = snapshot.data();
 
-  await updateDoc(doc(db, COLLECTION_NAME, plantId), {
-    lastFertilizedAt: date,
+  const fertilizingHistory = normalizeDateHistory(
+    currentData?.fertilizingHistory,
+    normalizeString(currentData?.lastFertilizedAt)
+  );
+  const nextHistory = normalizeDateHistory(fertilizingHistory, date);
+  const latestDate = getLatestDate(nextHistory, date);
+
+  await updateDoc(plantRef, {
+    lastFertilizedAt: latestDate,
+    fertilizingHistory: nextHistory,
     updatedAt: now,
     serverUpdatedAt: serverTimestamp(),
   });

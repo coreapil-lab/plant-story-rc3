@@ -473,9 +473,9 @@ function PlantDetail({
                 {calendarDays.map((day) => {
                   const isSelected = selectedDate === day.dateString;
                   const isWatered =
-                    plant.lastWateredAt === day.dateString;
+                    plant.wateringHistory.includes(day.dateString);
                   const isFertilized =
-                    plant.lastFertilizedAt === day.dateString;
+                    plant.fertilizingHistory.includes(day.dateString);
                   const isDisabled =
                     !day.isCurrentMonth || day.isFuture || savingDate;
 

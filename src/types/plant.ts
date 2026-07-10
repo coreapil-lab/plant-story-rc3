@@ -12,9 +12,11 @@ export interface Plant {
   adoptedAt: string;
 
   lastWateredAt: string;
+  wateringHistory: string[];
   wateringIntervalDays: number;
 
   lastFertilizedAt: string;
+  fertilizingHistory: string[];
   fertilizingIntervalDays: number;
 
   memo: string;
