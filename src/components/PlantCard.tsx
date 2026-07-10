@@ -55,9 +55,26 @@ function PlantCard({ plant, onClick }: PlantCardProps) {
       <div className="ps-card-content">
         <div className="ps-card-name">{plant.name}</div>
 
+        <div className="ps-card-nickname">
+          {plant.nickname || "별명 없음"}
+        </div>
+
         <div className="ps-card-meta">
-          <span>💧 {formatDPlus(wateredDays)}</span>
-          <span>🌱 {formatDPlus(fertilizedDays)}</span>
+          <div className="ps-card-meta-row">
+            <span className="ps-card-meta-label">
+              <span aria-hidden="true">💧</span>
+              물주기
+            </span>
+            <strong>{formatDPlus(wateredDays)}</strong>
+          </div>
+
+          <div className="ps-card-meta-row">
+            <span className="ps-card-meta-label">
+              <span aria-hidden="true">🌱</span>
+              영양제
+            </span>
+            <strong>{formatDPlus(fertilizedDays)}</strong>
+          </div>
         </div>
       </div>
     </button>
