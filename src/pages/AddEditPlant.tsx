@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
-import ImageUploader from "../components/ImageUploader";
 import { uploadPlantImage } from "../services/cloudinary";
 import type { Plant, PlantFormValues } from "../types/plant";
 import "./AddEditPlant.css";
@@ -61,7 +60,11 @@ function AddEditPlant({ plant, onSave, onCancel }: AddEditPlantProps) {
     }));
   };
 
-  const handleImageUpload = async (file: File) => {
+  const handleImageChange = async (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+
+    if (!file) return;
+
     setUploadingImage(true);
 
     try {
@@ -76,6 +79,7 @@ function AddEditPlant({ plant, onSave, onCancel }: AddEditPlantProps) {
       alert("사진 업로드에 실패했습니다. 다시 시도해 주세요.");
     } finally {
       setUploadingImage(false);
+      e.target.value = "";
     }
   };
 
@@ -112,76 +116,86 @@ function AddEditPlant({ plant, onSave, onCancel }: AddEditPlantProps) {
   };
 
   return (
-    <div className="page">
+    <div className="ae-page">
       <form onSubmit={handleSubmit}>
-        <header className="header">
-          <button type="button" className="top-button" onClick={onCancel}>
-            취소
+        <header className="ae-header">
+          <button type="button" className="ae-top-button" onClick={onCancel}>
+            뒤로
           </button>
 
           <button
             type="submit"
-            className="top-button"
+            className="ae-top-button"
             disabled={saving || uploadingImage}
           >
             {saving ? "저장 중" : "저장"}
           </button>
         </header>
 
-        <section className="hero">
-          <span className="hero-label">🌿 Plant Story</span>
-          <h1 className="hero-title">{plant ? "식물 수정" : "식물 추가"}</h1>
-          <p className="hero-desc">
-            {plant ? "식물 기록을 수정하세요." : "새로운 식물을 등록하세요."}
-          </p>
+        <section className="ae-title-card">
+          <span className="ae-title-label">🌿 Plant Story</span>
+          <h1>{plant ? "식물 수정" : "식물 추가"}</h1>
+          <p>{plant ? "식물 기록을 수정하세요." : "새로운 식물을 등록하세요."}</p>
         </section>
 
-        <ImageUploader
-          imageUrl={form.imageUrl}
-          uploading={uploadingImage}
-          onUpload={handleImageUpload}
-        />
+        <section className="ae-profile-card">
+          <div className="ae-photo-column">
+            <div className="ae-photo-box">
+              {form.imageUrl ? (
+                <img src={form.imageUrl} alt={form.name || "식물 사진"} />
+              ) : (
+                <span>🌿</span>
+              )}
+            </div>
 
-        <section className="form-card">
-          <div className="form-group">
-            <label className="form-label">식물 이름</label>
-            <input
-              className="form-input"
-              name="name"
-              value={form.name}
-              onChange={handleChange}
-              placeholder="예: 몬스테라"
-            />
+            <label className="ae-photo-button">
+              {uploadingImage ? "업로드 중" : "사진 변경"}
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                disabled={saving || uploadingImage}
+              />
+            </label>
           </div>
 
-          <div className="form-group">
-            <label className="form-label">별명</label>
-            <input
-              className="form-input"
-              name="nickname"
-              value={form.nickname}
-              onChange={handleChange}
-              placeholder="선택 입력"
-            />
-          </div>
+          <div className="ae-profile-fields">
+            <div className="ae-field">
+              <label>식물 이름</label>
+              <input
+                name="name"
+                value={form.name}
+                onChange={handleChange}
+                placeholder="예: 몬스테라"
+              />
+            </div>
 
-          <div className="form-group">
-            <label className="form-label">입양일</label>
-            <input
-              className="form-input"
-              type="date"
-              name="adoptedAt"
-              value={form.adoptedAt}
-              onChange={handleChange}
-            />
+            <div className="ae-field">
+              <label>별명</label>
+              <input
+                name="nickname"
+                value={form.nickname}
+                onChange={handleChange}
+                placeholder="선택 입력"
+              />
+            </div>
+
+            <div className="ae-field">
+              <label>입양일</label>
+              <input
+                type="date"
+                name="adoptedAt"
+                value={form.adoptedAt}
+                onChange={handleChange}
+              />
+            </div>
           </div>
         </section>
 
-        <section className="form-card">
-          <div className="form-group">
-            <label className="form-label">💧 물 준 날짜</label>
+        <section className="ae-form-card">
+          <div className="ae-form-group">
+            <label>💧 물 준 날짜</label>
             <input
-              className="form-input"
               type="date"
               name="lastWateredAt"
               value={form.lastWateredAt}
@@ -189,10 +203,9 @@ function AddEditPlant({ plant, onSave, onCancel }: AddEditPlantProps) {
             />
           </div>
 
-          <div className="form-group">
-            <label className="form-label">💧 물주기</label>
+          <div className="ae-form-group">
+            <label>💧 물주기</label>
             <input
-              className="form-input"
               type="number"
               name="wateringIntervalDays"
               min="1"
@@ -201,10 +214,9 @@ function AddEditPlant({ plant, onSave, onCancel }: AddEditPlantProps) {
             />
           </div>
 
-          <div className="form-group">
-            <label className="form-label">🌱 최근 영양제</label>
+          <div className="ae-form-group">
+            <label>🌱 최근 영양제</label>
             <input
-              className="form-input"
               type="date"
               name="lastFertilizedAt"
               value={form.lastFertilizedAt}
@@ -212,10 +224,9 @@ function AddEditPlant({ plant, onSave, onCancel }: AddEditPlantProps) {
             />
           </div>
 
-          <div className="form-group">
-            <label className="form-label">🌱 영양제 주기</label>
+          <div className="ae-form-group">
+            <label>🌱 영양제 주기</label>
             <input
-              className="form-input"
               type="number"
               name="fertilizingIntervalDays"
               min="1"
@@ -225,11 +236,10 @@ function AddEditPlant({ plant, onSave, onCancel }: AddEditPlantProps) {
           </div>
         </section>
 
-        <section className="form-card">
-          <div className="form-group">
-            <label className="form-label">메모</label>
+        <section className="ae-form-card">
+          <div className="ae-form-group">
+            <label>메모</label>
             <textarea
-              className="form-textarea"
               name="memo"
               value={form.memo}
               onChange={handleChange}
@@ -239,10 +249,10 @@ function AddEditPlant({ plant, onSave, onCancel }: AddEditPlantProps) {
           </div>
         </section>
 
-        <div className="button-row">
+        <div className="ae-button-row">
           <button
             type="submit"
-            className="primary-button"
+            className="ae-save-button"
             disabled={saving || uploadingImage}
           >
             {uploadingImage ? "사진 업로드 중" : saving ? "저장 중" : "저장하기"}
