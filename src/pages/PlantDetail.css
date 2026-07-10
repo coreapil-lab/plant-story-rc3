@@ -422,27 +422,27 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 3px;
+  gap: 4px;
   min-height: 8px;
   margin-top: 4px;
 }
 
 .pd-calendar-dot {
   display: inline-block;
-  width: 5px;
-  height: 5px;
-  flex: 0 0 5px;
+  width: 7px;
+  height: 7px;
+  flex: 0 0 7px;
   border-radius: 50%;
 }
 
 .pd-calendar-dot-water {
-  background: #1976d2;
-  box-shadow: 0 0 0 1px rgba(25, 118, 210, 0.14);
+  background: #007aff;
+  box-shadow: 0 0 0 1px rgba(0, 122, 255, 0.18);
 }
 
 .pd-calendar-dot-fertilizer {
-  background: #43a047;
-  box-shadow: 0 0 0 1px rgba(67, 160, 71, 0.14);
+  background: #ff9500;
+  box-shadow: 0 0 0 1px rgba(255, 149, 0, 0.18);
 }
 
 .pd-calendar-legend {
