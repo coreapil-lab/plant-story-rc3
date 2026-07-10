@@ -55,8 +55,6 @@ function PlantDetail({
   onFertilize,
 }: PlantDetailProps) {
   const adoptedDays = getDaysFrom(plant.adoptedAt);
-  const wateredDays = getDaysFrom(plant.lastWateredAt);
-  const fertilizedDays = getDaysFrom(plant.lastFertilizedAt);
 
   const handleDelete = async () => {
     if (!window.confirm("정말 삭제할까요?")) return;
@@ -145,42 +143,27 @@ function PlantDetail({
                 </div>
               )}
             </div>
-
-            <div className="pd-status-list">
-              <div className="pd-status-item">
-                <span aria-hidden="true">💧</span>
-                <span>{formatDPlus(wateredDays)}</span>
-              </div>
-
-              <div className="pd-status-item">
-                <span aria-hidden="true">🌱</span>
-                <span>{formatDPlus(fertilizedDays)}</span>
-              </div>
-            </div>
           </div>
 
           <div className="pd-profile-info">
             <div className="pd-profile-field">
-              <span className="pd-profile-label">식물 이름</span>
-              <h1 className="pd-profile-name">{plant.name}</h1>
+              <span className="pd-profile-label">
+                식물 이름
+              </span>
+
+              <h1 className="pd-profile-name">
+                {plant.name}
+              </h1>
             </div>
 
             <div className="pd-profile-field">
-              <span className="pd-profile-label">별명</span>
+              <span className="pd-profile-label">
+                별명
+              </span>
+
               <p className="pd-profile-value">
                 {plant.nickname || "별명 없음"}
               </p>
-            </div>
-
-            <div className="pd-profile-field">
-              <span className="pd-profile-label">입양일</span>
-              <p className="pd-profile-value">
-                {formatDate(plant.adoptedAt)}
-              </p>
-
-              <span className="pd-adopted-days">
-                {formatDPlus(adoptedDays)}
-              </span>
             </div>
           </div>
         </section>

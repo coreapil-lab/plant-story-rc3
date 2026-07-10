@@ -52,12 +52,12 @@
 .pd-profile {
   display: grid;
   grid-template-columns:
-    clamp(160px, 42vw, 205px)
+    clamp(180px, 46vw, 230px)
     minmax(0, 1fr);
   align-items: start;
   gap: clamp(16px, 4vw, 24px);
   width: 100%;
-  padding: 8px 0 24px;
+  padding: 8px 0 26px;
   border-bottom: 1px solid rgba(82, 126, 77, 0.16);
   box-sizing: border-box;
 }
@@ -68,10 +68,12 @@
 
 .pd-photo-frame {
   width: 100%;
-  aspect-ratio: 1 / 2;
+  aspect-ratio: 3 / 4;
   overflow: hidden;
   border: 1px solid rgba(104, 153, 91, 0.2);
+  border-radius: 24px;
   background: #edf6e9;
+  box-shadow: 0 12px 28px rgba(57, 100, 64, 0.1);
   box-sizing: border-box;
 }
 
@@ -79,6 +81,7 @@
   display: block;
   width: 100%;
   height: 100%;
+  border-radius: 0;
   object-fit: cover;
 }
 
@@ -88,6 +91,7 @@
   justify-content: center;
   width: 100%;
   height: 100%;
+  border-radius: 0;
   background: linear-gradient(
     180deg,
     #f3faef 0%,
@@ -97,83 +101,57 @@
 
 .pd-photo-placeholder svg {
   display: block;
-  width: min(54%, 88px);
+  width: min(54%, 96px);
   height: auto;
-}
-
-.pd-status-list {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 8px;
-  width: 100%;
-  margin-top: 12px;
-}
-
-.pd-status-item {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  width: 100%;
-  min-height: 40px;
-  padding: 0 10px;
-  border: 1px solid rgba(104, 153, 91, 0.14);
-  border-radius: 12px;
-  background: #eef7e9;
-  color: #214b2e;
-  font-size: 17px;
-  font-weight: 950;
-  white-space: nowrap;
-  box-sizing: border-box;
 }
 
 .pd-profile-info {
   display: flex;
   flex-direction: column;
   min-width: 0;
-  padding-top: 8px;
+  padding-top: 10px;
 }
 
 .pd-profile-field {
   min-width: 0;
-  margin-bottom: 18px;
-  padding-bottom: 18px;
+  margin-bottom: 20px;
+  padding-bottom: 20px;
   border-bottom: 1px solid rgba(82, 126, 77, 0.16);
 }
 
 .pd-profile-field:last-child {
   margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: 0;
 }
 
 .pd-profile-label {
-  margin: 0 0 6px;
+  display: block;
+  margin: 0 0 7px;
   color: #6d7e71;
   font-size: 14px;
   font-weight: 800;
   line-height: 1.35;
 }
 
+.pd-profile-name {
+  margin: 0;
+  color: #173d25;
+  font-size: clamp(22px, 5vw, 26px);
+  font-weight: 950;
+  line-height: 1.25;
+  letter-spacing: -0.6px;
+  overflow-wrap: anywhere;
+}
+
 .pd-profile-value {
   margin: 0;
   color: #173d25;
-  font-size: clamp(18px, 4vw, 22px);
+  font-size: clamp(18px, 4vw, 21px);
   font-weight: 900;
   line-height: 1.35;
   letter-spacing: -0.35px;
   overflow-wrap: anywhere;
-}
-
-.pd-adopted-days {
-  display: inline-flex;
-  align-items: center;
-  min-height: 32px;
-  margin-top: 10px;
-  padding: 0 11px;
-  border-radius: 10px;
-  background: #eef7e9;
-  color: #31623c;
-  font-size: 15px;
-  font-weight: 950;
 }
 
 .pd-section {
@@ -301,13 +279,13 @@
 @media (max-width: 480px) {
   .pd-profile {
     grid-template-columns:
-      clamp(155px, 43vw, 190px)
+      clamp(175px, 46vw, 210px)
       minmax(0, 1fr);
     gap: 15px;
   }
 
-  .pd-profile-label {
-    font-size: 14px;
+  .pd-profile-name {
+    font-size: clamp(21px, 5vw, 24px);
   }
 
   .pd-profile-value {
@@ -323,22 +301,30 @@
 
   .pd-profile {
     grid-template-columns:
-      clamp(170px, 44vw, 220px)
+      clamp(165px, 46vw, 190px)
       minmax(0, 1fr);
     gap: 13px;
   }
 
+  .pd-photo-frame {
+    border-radius: 22px;
+  }
+
   .pd-profile-info {
-    padding-top: 4px;
+    padding-top: 6px;
   }
 
   .pd-profile-field {
-    margin-bottom: 16px;
-    padding-bottom: 16px;
+    margin-bottom: 17px;
+    padding-bottom: 17px;
   }
 
   .pd-profile-label {
     font-size: 13px;
+  }
+
+  .pd-profile-name {
+    font-size: clamp(20px, 5.2vw, 23px);
   }
 
   .pd-profile-value {
@@ -358,9 +344,13 @@
 @media (max-width: 360px) {
   .pd-profile {
     grid-template-columns:
-      clamp(140px, 43vw, 154px)
+      clamp(145px, 45vw, 158px)
       minmax(0, 1fr);
     gap: 10px;
+  }
+
+  .pd-photo-frame {
+    border-radius: 20px;
   }
 
   .pd-profile-field {
@@ -372,14 +362,12 @@
     font-size: 13px;
   }
 
-  .pd-profile-value {
-    font-size: 16px;
+  .pd-profile-name {
+    font-size: 19px;
   }
 
-  .pd-status-item {
-    min-height: 36px;
-    padding: 0 6px;
-    font-size: 14px;
+  .pd-profile-value {
+    font-size: 16px;
   }
 
   .pd-info-row {
