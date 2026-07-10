@@ -193,9 +193,15 @@ function AddEditPlant({ plant, onSave, onCancel }: AddEditPlantProps) {
                   placeholder="선택 입력"
                 />
               </div>
+            </div>
+          </section>
 
-              <div className="ae-profile-field">
-                <label htmlFor="ae-adopted-at">입양일</label>
+          <section className="ae-section">
+            <h2 className="ae-section-title">관리 정보</h2>
+
+            <div className="ae-care-grid">
+              <div className="ae-form-group ae-form-group-full">
+                <label htmlFor="ae-adopted-at">📅 입양일</label>
 
                 <input
                   id="ae-adopted-at"
@@ -205,13 +211,7 @@ function AddEditPlant({ plant, onSave, onCancel }: AddEditPlantProps) {
                   onChange={handleChange}
                 />
               </div>
-            </div>
-          </section>
 
-          <section className="ae-section">
-            <h2 className="ae-section-title">관리 정보</h2>
-
-            <div className="ae-care-grid">
               <div className="ae-form-group">
                 <label htmlFor="ae-watered-at">💧 물 준 날짜</label>
 

@@ -66,12 +66,12 @@
 .ae-profile {
   display: grid;
   grid-template-columns:
-    clamp(160px, 42vw, 205px)
+    clamp(180px, 46vw, 230px)
     minmax(0, 1fr);
   align-items: start;
   gap: clamp(16px, 4vw, 24px);
   width: 100%;
-  padding: 8px 0 24px;
+  padding: 8px 0 26px;
   border-bottom: 1px solid rgba(82, 126, 77, 0.16);
   box-sizing: border-box;
 }
@@ -82,11 +82,12 @@
 
 .ae-photo-frame {
   width: 100%;
-  aspect-ratio: 1 / 2;
+  aspect-ratio: 3 / 4;
   overflow: hidden;
   border: 1px solid rgba(104, 153, 91, 0.2);
-  border-radius: 0;
+  border-radius: 24px;
   background: #edf6e9;
+  box-shadow: 0 12px 28px rgba(57, 100, 64, 0.1);
   box-sizing: border-box;
 }
 
@@ -94,8 +95,8 @@
   display: block;
   width: 100%;
   height: 100%;
-  object-fit: cover;
   border-radius: 0;
+  object-fit: cover;
 }
 
 .ae-photo-placeholder {
@@ -104,6 +105,7 @@
   justify-content: center;
   width: 100%;
   height: 100%;
+  border-radius: 0;
   background: linear-gradient(
     180deg,
     #f3faef 0%,
@@ -141,24 +143,26 @@
   display: flex;
   flex-direction: column;
   min-width: 0;
-  padding-top: 8px;
+  padding-top: 10px;
 }
 
 .ae-profile-field {
   min-width: 0;
-  margin-bottom: 18px;
-  padding-bottom: 18px;
+  margin-bottom: 20px;
+  padding-bottom: 20px;
   border-bottom: 1px solid rgba(82, 126, 77, 0.16);
 }
 
 .ae-profile-field:last-child {
   margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: 0;
 }
 
 .ae-profile-field label,
 .ae-form-group label {
   display: block;
-  margin-bottom: 6px;
+  margin-bottom: 7px;
   color: #6d7e71;
   font-size: 14px;
   font-weight: 800;
@@ -184,6 +188,10 @@
   min-height: 48px;
   padding: 0 12px;
   border-radius: 12px;
+}
+
+.ae-profile-field input {
+  font-size: 15px;
 }
 
 .ae-form-group textarea {
@@ -231,6 +239,10 @@
   min-width: 0;
 }
 
+.ae-form-group-full {
+  grid-column: 1 / -1;
+}
+
 .ae-button-row {
   width: 100%;
   margin-top: 22px;
@@ -265,7 +277,7 @@
 @media (max-width: 480px) {
   .ae-profile {
     grid-template-columns:
-      clamp(155px, 43vw, 190px)
+      clamp(175px, 46vw, 210px)
       minmax(0, 1fr);
     gap: 15px;
   }
@@ -287,18 +299,22 @@
 
   .ae-profile {
     grid-template-columns:
-      clamp(150px, 43vw, 180px)
+      clamp(165px, 46vw, 190px)
       minmax(0, 1fr);
     gap: 13px;
   }
 
+  .ae-photo-frame {
+    border-radius: 22px;
+  }
+
   .ae-profile-fields {
-    padding-top: 4px;
+    padding-top: 6px;
   }
 
   .ae-profile-field {
-    margin-bottom: 15px;
-    padding-bottom: 15px;
+    margin-bottom: 17px;
+    padding-bottom: 17px;
   }
 
   .ae-profile-field label,
@@ -350,9 +366,13 @@
 
   .ae-profile {
     grid-template-columns:
-      clamp(138px, 42vw, 150px)
+      clamp(145px, 45vw, 158px)
       minmax(0, 1fr);
     gap: 10px;
+  }
+
+  .ae-photo-frame {
+    border-radius: 20px;
   }
 
   .ae-photo-button {
@@ -361,8 +381,8 @@
   }
 
   .ae-profile-field {
-    margin-bottom: 13px;
-    padding-bottom: 13px;
+    margin-bottom: 14px;
+    padding-bottom: 14px;
   }
 
   .ae-profile-field label {
@@ -377,6 +397,10 @@
 
   .ae-care-grid {
     grid-template-columns: 1fr;
+  }
+
+  .ae-form-group-full {
+    grid-column: auto;
   }
 
   .ae-save-button {
