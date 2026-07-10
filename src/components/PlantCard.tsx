@@ -23,7 +23,7 @@ function getDaysFrom(dateString: string) {
 }
 
 function formatDPlus(days: number | null) {
-  if (days === null) return "없음";
+  if (days === null) return "기록 없음";
 
   return `D+${days}`;
 }
@@ -53,27 +53,41 @@ function PlantCard({ plant, onClick }: PlantCardProps) {
       </div>
 
       <div className="ps-card-content">
-        <div className="ps-card-name">{plant.name}</div>
+        <div className="ps-card-heading">
+          <div className="ps-card-name">{plant.name}</div>
 
-        <div className="ps-card-nickname">
-          {plant.nickname || "별명 없음"}
+          <div className="ps-card-nickname">
+            {plant.nickname || "별명 없음"}
+          </div>
         </div>
 
-        <div className="ps-card-meta">
-          <div className="ps-card-meta-row">
-            <span className="ps-card-meta-label">
-              <span aria-hidden="true">💧</span>
+        <div className="ps-card-divider" />
+
+        <div className="ps-card-care-list">
+          <div className="ps-card-care-row">
+            <span className="ps-card-care-label">
+              <span className="ps-card-care-icon" aria-hidden="true">
+                💧
+              </span>
               물주기
             </span>
-            <strong>{formatDPlus(wateredDays)}</strong>
+
+            <strong className="ps-card-care-value ps-card-care-value-water">
+              {formatDPlus(wateredDays)}
+            </strong>
           </div>
 
-          <div className="ps-card-meta-row">
-            <span className="ps-card-meta-label">
-              <span aria-hidden="true">🌱</span>
+          <div className="ps-card-care-row">
+            <span className="ps-card-care-label">
+              <span className="ps-card-care-icon" aria-hidden="true">
+                🌱
+              </span>
               영양제
             </span>
-            <strong>{formatDPlus(fertilizedDays)}</strong>
+
+            <strong className="ps-card-care-value">
+              {formatDPlus(fertilizedDays)}
+            </strong>
           </div>
         </div>
       </div>
