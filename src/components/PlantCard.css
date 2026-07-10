@@ -1,62 +1,70 @@
 .ps-plant-card {
+  display: flex;
+  flex-direction: column;
   width: 100%;
   min-width: 0;
-  min-height: 118px;
+  padding: 10px;
   border: 0;
   border-radius: 24px;
-  padding: 12px;
   background: #ffffff;
-  display: grid;
-  grid-template-columns: 86px minmax(0, 1fr);
-  align-items: center;
-  gap: 13px;
-  box-shadow: 0 12px 28px rgba(45, 72, 51, 0.08);
+  box-shadow: 0 12px 28px rgba(57, 100, 64, 0.1);
   cursor: pointer;
   box-sizing: border-box;
   overflow: hidden;
   text-align: left;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .ps-plant-card:active {
   transform: scale(0.98);
 }
 
-.ps-card-icon {
-  width: 86px;
-  height: 94px;
-  flex-shrink: 0;
-  border-radius: 20px;
-  background: linear-gradient(135deg, #edf9e8, #fbfff7);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 38px;
-  line-height: 1;
-  overflow: hidden;
-  box-shadow: inset 0 0 0 1px rgba(127, 184, 105, 0.16);
-}
-
-.ps-card-icon img {
+.ps-card-photo-frame {
   width: 100%;
-  height: 100%;
-  object-fit: contain;
-  display: block;
-  padding: 7px;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border: 1px solid rgba(104, 153, 91, 0.2);
+  border-radius: 20px;
+  background: #edf6e9;
   box-sizing: border-box;
 }
 
-.ps-card-body {
-  min-width: 0;
+.ps-card-photo {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
+  object-fit: cover;
+}
+
+.ps-card-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
+  background: linear-gradient(
+    180deg,
+    #f3faef 0%,
+    #e9f4e5 100%
+  );
+  font-size: 48px;
+  line-height: 1;
+}
+
+.ps-card-content {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  gap: 9px;
+  min-width: 0;
+  padding: 12px 2px 2px;
 }
 
 .ps-card-name {
   width: 100%;
   min-width: 0;
-  color: #143c34;
+  margin-bottom: 10px;
+  color: #173d25;
   font-size: 18px;
   font-weight: 950;
   line-height: 1.25;
@@ -67,55 +75,83 @@
 }
 
 .ps-card-meta {
-  width: 100%;
-  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 7px;
+  width: 100%;
+  min-width: 0;
 }
 
 .ps-card-meta span {
-  width: fit-content;
-  min-width: 92px;
-  height: 30px;
-  padding: 0 12px;
-  border-radius: 999px;
-  background: #f5faf2;
-  border: 1px solid #d8ecd0;
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  justify-content: center;
+  width: 100%;
+  min-height: 32px;
+  padding: 0 10px;
+  border: 1px solid rgba(104, 153, 91, 0.14);
+  border-radius: 14px;
+  background: #f4faf1;
   color: #245a31;
   font-size: 14px;
   font-weight: 900;
-  box-sizing: border-box;
-  white-space: nowrap;
+  line-height: 1;
   letter-spacing: -0.25px;
+  white-space: nowrap;
+  box-sizing: border-box;
 }
 
-@media (max-width: 380px) {
+@media (max-width: 420px) {
   .ps-plant-card {
-    grid-template-columns: 78px minmax(0, 1fr);
-    min-height: 108px;
+    padding: 9px;
     border-radius: 22px;
-    padding: 10px;
-    gap: 11px;
   }
 
-  .ps-card-icon {
-    width: 78px;
-    height: 86px;
+  .ps-card-photo-frame {
     border-radius: 18px;
-    font-size: 34px;
+  }
+
+  .ps-card-content {
+    padding-top: 10px;
   }
 
   .ps-card-name {
+    margin-bottom: 9px;
     font-size: 17px;
   }
 
+  .ps-card-meta {
+    gap: 6px;
+  }
+
   .ps-card-meta span {
-    min-width: 86px;
-    height: 28px;
+    min-height: 30px;
+    padding: 0 9px;
+    border-radius: 13px;
     font-size: 13px;
+  }
+}
+
+@media (max-width: 360px) {
+  .ps-plant-card {
+    padding: 8px;
+    border-radius: 20px;
+  }
+
+  .ps-card-photo-frame {
+    border-radius: 16px;
+  }
+
+  .ps-card-placeholder {
+    font-size: 40px;
+  }
+
+  .ps-card-name {
+    font-size: 16px;
+  }
+
+  .ps-card-meta span {
+    min-height: 29px;
+    padding: 0 8px;
+    font-size: 12px;
   }
 }

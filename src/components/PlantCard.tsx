@@ -24,6 +24,7 @@ function getDaysFrom(dateString: string) {
 
 function formatDPlus(days: number | null) {
   if (days === null) return "없음";
+
   return `D+${days}`;
 }
 
@@ -37,19 +38,27 @@ function PlantCard({ plant, onClick }: PlantCardProps) {
       type="button"
       onClick={() => onClick(plant)}
     >
-      <div className="ps-card-icon" aria-hidden="true">
+      <div className="ps-card-photo-frame">
         {plant.imageUrl ? (
-          <img src={plant.imageUrl} alt={plant.name} />
+          <img
+            className="ps-card-photo"
+            src={plant.imageUrl}
+            alt={plant.name}
+          />
         ) : (
-          "🌿"
+          <div className="ps-card-placeholder" aria-hidden="true">
+            🌿
+          </div>
         )}
       </div>
 
-      <div className="ps-card-name">{plant.name}</div>
+      <div className="ps-card-content">
+        <div className="ps-card-name">{plant.name}</div>
 
-      <div className="ps-card-meta">
-        <span>💧 {formatDPlus(wateredDays)}</span>
-        <span>🌱 {formatDPlus(fertilizedDays)}</span>
+        <div className="ps-card-meta">
+          <span>💧 {formatDPlus(wateredDays)}</span>
+          <span>🌱 {formatDPlus(fertilizedDays)}</span>
+        </div>
       </div>
     </button>
   );
