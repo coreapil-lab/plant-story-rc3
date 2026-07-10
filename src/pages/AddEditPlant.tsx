@@ -117,147 +117,183 @@ function AddEditPlant({ plant, onSave, onCancel }: AddEditPlantProps) {
 
   return (
     <div className="ae-page">
-      <form onSubmit={handleSubmit}>
+      <form className="ae-form" onSubmit={handleSubmit}>
         <header className="ae-header">
-          <button type="button" className="ae-top-button" onClick={onCancel}>
+          <button
+            type="button"
+            className="ae-header-button"
+            onClick={onCancel}
+          >
             뒤로
           </button>
 
+          <h1 className="ae-header-title">
+            {plant ? "식물 수정" : "식물 추가"}
+          </h1>
+
           <button
             type="submit"
-            className="ae-top-button"
+            className="ae-header-button"
             disabled={saving || uploadingImage}
           >
             {saving ? "저장 중" : "저장"}
           </button>
         </header>
 
-        <section className="ae-title-card">
-          <span className="ae-title-label">🌿 Plant Story</span>
-          <h1>{plant ? "식물 수정" : "식물 추가"}</h1>
-          <p>{plant ? "식물 기록을 수정하세요." : "새로운 식물을 등록하세요."}</p>
-        </section>
+        <main className="ae-content">
+          <section className="ae-profile">
+            <div className="ae-photo-column">
+              <div className="ae-photo-frame">
+                {form.imageUrl ? (
+                  <img
+                    className="ae-photo-image"
+                    src={form.imageUrl}
+                    alt={form.name || "식물 사진"}
+                  />
+                ) : (
+                  <div className="ae-photo-placeholder">
+                    <span aria-hidden="true">🌿</span>
+                  </div>
+                )}
+              </div>
 
-        <section className="ae-profile-card">
-          <div className="ae-photo-column">
-            <div className="ae-photo-box">
-              {form.imageUrl ? (
-                <img src={form.imageUrl} alt={form.name || "식물 사진"} />
-              ) : (
-                <span>🌿</span>
-              )}
+              <label className="ae-photo-button">
+                {uploadingImage ? "업로드 중" : "사진 변경"}
+
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  disabled={saving || uploadingImage}
+                />
+              </label>
             </div>
 
-            <label className="ae-photo-button">
-              {uploadingImage ? "업로드 중" : "사진 변경"}
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleImageChange}
-                disabled={saving || uploadingImage}
-              />
-            </label>
-          </div>
+            <div className="ae-profile-fields">
+              <div className="ae-profile-field">
+                <label htmlFor="ae-name">식물 이름</label>
 
-          <div className="ae-profile-fields">
-            <div className="ae-field">
-              <label>식물 이름</label>
-              <input
-                name="name"
-                value={form.name}
+                <input
+                  id="ae-name"
+                  name="name"
+                  value={form.name}
+                  onChange={handleChange}
+                  placeholder="예: 몬스테라"
+                />
+              </div>
+
+              <div className="ae-profile-field">
+                <label htmlFor="ae-nickname">별명</label>
+
+                <input
+                  id="ae-nickname"
+                  name="nickname"
+                  value={form.nickname}
+                  onChange={handleChange}
+                  placeholder="선택 입력"
+                />
+              </div>
+
+              <div className="ae-profile-field">
+                <label htmlFor="ae-adopted-at">입양일</label>
+
+                <input
+                  id="ae-adopted-at"
+                  type="date"
+                  name="adoptedAt"
+                  value={form.adoptedAt}
+                  onChange={handleChange}
+                />
+              </div>
+            </div>
+          </section>
+
+          <section className="ae-section">
+            <h2 className="ae-section-title">관리 정보</h2>
+
+            <div className="ae-care-grid">
+              <div className="ae-form-group">
+                <label htmlFor="ae-watered-at">💧 물 준 날짜</label>
+
+                <input
+                  id="ae-watered-at"
+                  type="date"
+                  name="lastWateredAt"
+                  value={form.lastWateredAt}
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div className="ae-form-group">
+                <label htmlFor="ae-watering-interval">💧 물주기</label>
+
+                <input
+                  id="ae-watering-interval"
+                  type="number"
+                  name="wateringIntervalDays"
+                  min="1"
+                  value={form.wateringIntervalDays}
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div className="ae-form-group">
+                <label htmlFor="ae-fertilized-at">🌱 최근 영양제</label>
+
+                <input
+                  id="ae-fertilized-at"
+                  type="date"
+                  name="lastFertilizedAt"
+                  value={form.lastFertilizedAt}
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div className="ae-form-group">
+                <label htmlFor="ae-fertilizing-interval">
+                  🌱 영양제 주기
+                </label>
+
+                <input
+                  id="ae-fertilizing-interval"
+                  type="number"
+                  name="fertilizingIntervalDays"
+                  min="1"
+                  value={form.fertilizingIntervalDays}
+                  onChange={handleChange}
+                />
+              </div>
+            </div>
+          </section>
+
+          <section className="ae-section">
+            <h2 className="ae-section-title">메모</h2>
+
+            <div className="ae-form-group">
+              <textarea
+                name="memo"
+                value={form.memo}
                 onChange={handleChange}
-                placeholder="예: 몬스테라"
+                placeholder="식물 상태나 관리 메모를 적어 주세요."
+                rows={5}
               />
             </div>
+          </section>
 
-            <div className="ae-field">
-              <label>별명</label>
-              <input
-                name="nickname"
-                value={form.nickname}
-                onChange={handleChange}
-                placeholder="선택 입력"
-              />
-            </div>
-
-            <div className="ae-field">
-              <label>입양일</label>
-              <input
-                type="date"
-                name="adoptedAt"
-                value={form.adoptedAt}
-                onChange={handleChange}
-              />
-            </div>
+          <div className="ae-button-row">
+            <button
+              type="submit"
+              className="ae-save-button"
+              disabled={saving || uploadingImage}
+            >
+              {uploadingImage
+                ? "사진 업로드 중"
+                : saving
+                  ? "저장 중"
+                  : "저장하기"}
+            </button>
           </div>
-        </section>
-
-        <section className="ae-form-card">
-          <div className="ae-form-group">
-            <label>💧 물 준 날짜</label>
-            <input
-              type="date"
-              name="lastWateredAt"
-              value={form.lastWateredAt}
-              onChange={handleChange}
-            />
-          </div>
-
-          <div className="ae-form-group">
-            <label>💧 물주기</label>
-            <input
-              type="number"
-              name="wateringIntervalDays"
-              min="1"
-              value={form.wateringIntervalDays}
-              onChange={handleChange}
-            />
-          </div>
-
-          <div className="ae-form-group">
-            <label>🌱 최근 영양제</label>
-            <input
-              type="date"
-              name="lastFertilizedAt"
-              value={form.lastFertilizedAt}
-              onChange={handleChange}
-            />
-          </div>
-
-          <div className="ae-form-group">
-            <label>🌱 영양제 주기</label>
-            <input
-              type="number"
-              name="fertilizingIntervalDays"
-              min="1"
-              value={form.fertilizingIntervalDays}
-              onChange={handleChange}
-            />
-          </div>
-        </section>
-
-        <section className="ae-form-card">
-          <div className="ae-form-group">
-            <label>메모</label>
-            <textarea
-              name="memo"
-              value={form.memo}
-              onChange={handleChange}
-              placeholder="식물 상태나 관리 메모를 적어 주세요."
-              rows={5}
-            />
-          </div>
-        </section>
-
-        <div className="ae-button-row">
-          <button
-            type="submit"
-            className="ae-save-button"
-            disabled={saving || uploadingImage}
-          >
-            {uploadingImage ? "사진 업로드 중" : saving ? "저장 중" : "저장하기"}
-          </button>
-        </div>
+        </main>
       </form>
     </div>
   );
