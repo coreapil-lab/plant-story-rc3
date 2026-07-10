@@ -28,6 +28,7 @@
 }
 
 .ps-card-photo-frame {
+  position: relative;
   width: 100%;
   aspect-ratio: 4 / 4.65;
   overflow: hidden;
@@ -58,6 +59,44 @@
   font-size: 52px;
   line-height: 1;
 }
+
+
+.ps-card-quick-actions {
+  position: absolute;
+  right: 11px;
+  bottom: 11px;
+  left: 11px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  pointer-events: none;
+}
+
+.ps-card-quick-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: 0 2px 7px rgba(20, 28, 22, 0.13), 0 8px 18px rgba(20, 28, 22, 0.12);
+  font: inherit;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+  pointer-events: auto;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ps-card-quick-button:active { transform: scale(0.92); }
+.ps-card-quick-button:disabled { opacity: 0.58; cursor: wait; }
+.ps-card-quick-button span { transform: translateY(-1px); }
 
 .ps-card-content {
   display: flex;
@@ -154,7 +193,45 @@
     border-radius: 24px;
   }
 
-  .ps-card-content {
+  
+.ps-card-quick-actions {
+  position: absolute;
+  right: 11px;
+  bottom: 11px;
+  left: 11px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  pointer-events: none;
+}
+
+.ps-card-quick-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: 0 2px 7px rgba(20, 28, 22, 0.13), 0 8px 18px rgba(20, 28, 22, 0.12);
+  font: inherit;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+  pointer-events: auto;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ps-card-quick-button:active { transform: scale(0.92); }
+.ps-card-quick-button:disabled { opacity: 0.58; cursor: wait; }
+.ps-card-quick-button span { transform: translateY(-1px); }
+
+.ps-card-content {
     padding: 16px 14px 15px;
   }
 
@@ -172,7 +249,45 @@
     border-radius: 22px;
   }
 
-  .ps-card-content {
+  
+.ps-card-quick-actions {
+  position: absolute;
+  right: 11px;
+  bottom: 11px;
+  left: 11px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  pointer-events: none;
+}
+
+.ps-card-quick-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: 0 2px 7px rgba(20, 28, 22, 0.13), 0 8px 18px rgba(20, 28, 22, 0.12);
+  font: inherit;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+  pointer-events: auto;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ps-card-quick-button:active { transform: scale(0.92); }
+.ps-card-quick-button:disabled { opacity: 0.58; cursor: wait; }
+.ps-card-quick-button span { transform: translateY(-1px); }
+
+.ps-card-content {
     padding: 14px 12px 14px;
   }
 
@@ -191,4 +306,13 @@
   .ps-card-care-value {
     font-size: 13px;
   }
+}
+
+@media (max-width: 420px) {
+  .ps-card-quick-actions { right: 9px; bottom: 9px; left: 9px; }
+  .ps-card-quick-button { width: 44px; height: 44px; font-size: 23px; }
+}
+
+@media (max-width: 360px) {
+  .ps-card-quick-button { width: 42px; height: 42px; font-size: 22px; }
 }

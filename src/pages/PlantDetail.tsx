@@ -12,6 +12,8 @@ type PlantDetailProps = {
   onDelete: (plantId: string) => Promise<void>;
   onWater: (plant: Plant, date: string) => Promise<void>;
   onFertilize: (plant: Plant, date: string) => Promise<void>;
+  onDeleteWaterRecord: (plant: Plant, date: string) => Promise<void>;
+  onDeleteFertilizerRecord: (plant: Plant, date: string) => Promise<void>;
 };
 
 type CalendarDay = {
@@ -116,6 +118,8 @@ function PlantDetail({
   onDelete,
   onWater,
   onFertilize,
+  onDeleteWaterRecord,
+  onDeleteFertilizerRecord,
 }: PlantDetailProps) {
   const adoptedDays = getDaysFrom(plant.adoptedAt);
   const [dateAction, setDateAction] = useState<DateAction | null>(null);
@@ -219,6 +223,30 @@ function PlantDetail({
 
     touchStartX.current = null;
     touchCurrentX.current = null;
+  };
+
+  const handleDeleteSelectedRecord = async () => {
+    if (!dateAction || !selectedDate) return;
+    const hasRecord = dateAction === "water"
+      ? plant.wateringHistory.includes(selectedDate)
+      : plant.fertilizingHistory.includes(selectedDate);
+    if (!hasRecord) {
+      alert("선택한 날짜에 취소할 기록이 없습니다.");
+      return;
+    }
+    const label = dateAction === "water" ? "물주기" : "영양제";
+    if (!window.confirm(`${selectedDate} ${label} 기록을 취소할까요?`)) return;
+    setSavingDate(true);
+    try {
+      if (dateAction === "water") {
+        await onDeleteWaterRecord(plant, selectedDate);
+      } else {
+        await onDeleteFertilizerRecord(plant, selectedDate);
+      }
+      setDateAction(null);
+    } finally {
+      setSavingDate(false);
+    }
   };
 
   const handleConfirmDate = async () => {
@@ -539,6 +567,15 @@ function PlantDetail({
               </div>
             </div>
 
+            <button
+              type="button"
+              className="pd-date-record-cancel-button"
+              onClick={handleDeleteSelectedRecord}
+              disabled={savingDate || !selectedDate || (dateAction === "water" ? !plant.wateringHistory.includes(selectedDate) : !plant.fertilizingHistory.includes(selectedDate))}
+            >
+              선택한 {dateAction === "water" ? "물주기" : "영양제"} 기록 취소
+            </button>
+
             <div className="pd-date-modal-actions">
               <button
                 type="button"
@@ -546,7 +583,7 @@ function PlantDetail({
                 onClick={closeDatePicker}
                 disabled={savingDate}
               >
-                취소
+                닫기
               </button>
 
               <button

@@ -8,6 +8,8 @@ type HomeProps = {
   loading: boolean;
   onAddPlant: () => void;
   onSelectPlant: (plant: Plant) => void;
+  onQuickWater: (plant: Plant) => Promise<void>;
+  onQuickFertilize: (plant: Plant) => Promise<void>;
   onLogout: () => Promise<void>;
 };
 
@@ -16,6 +18,8 @@ function Home({
   loading,
   onAddPlant,
   onSelectPlant,
+  onQuickWater,
+  onQuickFertilize,
   onLogout,
 }: HomeProps) {
   const [searchText, setSearchText] = useState('');
@@ -63,6 +67,8 @@ function Home({
               key={plant.id}
               plant={plant}
               onClick={onSelectPlant}
+              onQuickWater={onQuickWater}
+              onQuickFertilize={onQuickFertilize}
             />
           ))}
         </main>

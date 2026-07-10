@@ -46,9 +46,8 @@ function normalizeDateHistory(
   return [...new Set(history)].sort((a, b) => a.localeCompare(b));
 }
 
-function getLatestDate(history: string[], fallbackDate: string): string {
-  if (history.length === 0) return fallbackDate;
-
+function getLatestDate(history: string[]): string {
+  if (history.length === 0) return "";
   return history[history.length - 1];
 }
 
@@ -76,20 +75,14 @@ export function mapPlantDocument(id: string, data: DocumentData): Plant {
 
     adoptedAt: normalizeString(data.adoptedAt),
 
-    lastWateredAt: getLatestDate(
-      wateringHistory,
-      storedLastWateredAt
-    ),
+    lastWateredAt: getLatestDate(wateringHistory),
     wateringHistory,
     wateringIntervalDays: normalizeNumber(
       data.wateringIntervalDays,
       7
     ),
 
-    lastFertilizedAt: getLatestDate(
-      fertilizingHistory,
-      storedLastFertilizedAt
-    ),
+    lastFertilizedAt: getLatestDate(fertilizingHistory),
     fertilizingHistory,
     fertilizingIntervalDays: normalizeNumber(
       data.fertilizingIntervalDays,
@@ -232,7 +225,7 @@ export async function updateWateredAt(
     normalizeString(currentData?.lastWateredAt)
   );
   const nextHistory = normalizeDateHistory(wateringHistory, date);
-  const latestDate = getLatestDate(nextHistory, date);
+  const latestDate = getLatestDate(nextHistory);
 
   await updateDoc(plantRef, {
     lastWateredAt: latestDate,
@@ -256,10 +249,41 @@ export async function updateFertilizedAt(
     normalizeString(currentData?.lastFertilizedAt)
   );
   const nextHistory = normalizeDateHistory(fertilizingHistory, date);
-  const latestDate = getLatestDate(nextHistory, date);
+  const latestDate = getLatestDate(nextHistory);
 
   await updateDoc(plantRef, {
     lastFertilizedAt: latestDate,
+    fertilizingHistory: nextHistory,
+    updatedAt: now,
+    serverUpdatedAt: serverTimestamp(),
+  });
+}
+
+
+export async function deleteWateredRecord(plantId: string, date: string): Promise<void> {
+  const now = new Date().toISOString();
+  const plantRef = doc(db, COLLECTION_NAME, plantId);
+  const snapshot = await getDoc(plantRef);
+  const currentData = snapshot.data();
+  const currentHistory = normalizeDateHistory(currentData?.wateringHistory, normalizeString(currentData?.lastWateredAt));
+  const nextHistory = currentHistory.filter((item) => item !== date);
+  await updateDoc(plantRef, {
+    lastWateredAt: getLatestDate(nextHistory),
+    wateringHistory: nextHistory,
+    updatedAt: now,
+    serverUpdatedAt: serverTimestamp(),
+  });
+}
+
+export async function deleteFertilizedRecord(plantId: string, date: string): Promise<void> {
+  const now = new Date().toISOString();
+  const plantRef = doc(db, COLLECTION_NAME, plantId);
+  const snapshot = await getDoc(plantRef);
+  const currentData = snapshot.data();
+  const currentHistory = normalizeDateHistory(currentData?.fertilizingHistory, normalizeString(currentData?.lastFertilizedAt));
+  const nextHistory = currentHistory.filter((item) => item !== date);
+  await updateDoc(plantRef, {
+    lastFertilizedAt: getLatestDate(nextHistory),
     fertilizingHistory: nextHistory,
     updatedAt: now,
     serverUpdatedAt: serverTimestamp(),

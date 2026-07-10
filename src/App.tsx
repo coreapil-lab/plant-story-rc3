@@ -13,7 +13,9 @@ import { auth } from "./firebase";
 import type { Plant, PlantFormValues } from "./types/plant";
 import {
   createPlant,
+  deleteFertilizedRecord,
   deletePlant,
+  deleteWateredRecord,
   subscribePlants,
   updateFertilizedAt,
   updatePlant,
@@ -32,6 +34,14 @@ type PlantStoryHistoryState = {
   pageMode: PageMode;
   plantId: string | null;
 };
+
+function getTodayString() {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, "0");
+  const day = String(today.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
 
 function createHistoryState(
   pageMode: PageMode,
@@ -203,6 +213,24 @@ function App() {
     await updateFertilizedAt(plant.id, date);
   };
 
+  const handleQuickWater = async (plant: Plant) => {
+    if (!window.confirm(`${plant.name}에게 오늘 물을 준 것으로 기록할까요?`)) return;
+    await updateWateredAt(plant.id, getTodayString());
+  };
+
+  const handleQuickFertilize = async (plant: Plant) => {
+    if (!window.confirm(`${plant.name}에게 오늘 영양제를 준 것으로 기록할까요?`)) return;
+    await updateFertilizedAt(plant.id, getTodayString());
+  };
+
+  const handleDeleteWaterRecord = async (plant: Plant, date: string) => {
+    await deleteWateredRecord(plant.id, date);
+  };
+
+  const handleDeleteFertilizerRecord = async (plant: Plant, date: string) => {
+    await deleteFertilizedRecord(plant.id, date);
+  };
+
   if (isAuthLoading) {
     return <div className="app-loading">불러오는 중...</div>;
   }
@@ -246,6 +274,8 @@ function App() {
           onLogout={handleLogout}
           onAddPlant={handleAddPlant}
           onSelectPlant={handleSelectPlant}
+          onQuickWater={handleQuickWater}
+          onQuickFertilize={handleQuickFertilize}
         />
       );
     }
@@ -258,6 +288,8 @@ function App() {
         onDelete={handleDeletePlant}
         onWater={handleWaterPlant}
         onFertilize={handleFertilizePlant}
+        onDeleteWaterRecord={handleDeleteWaterRecord}
+        onDeleteFertilizerRecord={handleDeleteFertilizerRecord}
       />
     );
   }
@@ -269,6 +301,8 @@ function App() {
       onLogout={handleLogout}
       onAddPlant={handleAddPlant}
       onSelectPlant={handleSelectPlant}
+      onQuickWater={handleQuickWater}
+      onQuickFertilize={handleQuickFertilize}
     />
   );
 }

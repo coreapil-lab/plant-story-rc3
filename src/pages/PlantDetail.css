@@ -422,27 +422,27 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: 3px;
   min-height: 8px;
   margin-top: 4px;
 }
 
 .pd-calendar-dot {
   display: inline-block;
-  width: 7px;
-  height: 7px;
-  flex: 0 0 7px;
+  width: 5px;
+  height: 5px;
+  flex: 0 0 5px;
   border-radius: 50%;
 }
 
 .pd-calendar-dot-water {
-  background: #007aff;
-  box-shadow: 0 0 0 1px rgba(0, 122, 255, 0.18);
+  background: #1E88E5;
+  box-shadow: 0 0 0 1px rgba(30, 136, 229, 0.28);
 }
 
 .pd-calendar-dot-fertilizer {
-  background: #ff9500;
-  box-shadow: 0 0 0 1px rgba(255, 149, 0, 0.18);
+  background: #FF8A00;
+  box-shadow: 0 0 0 1px rgba(255, 138, 0, 0.28);
 }
 
 .pd-calendar-legend {
@@ -598,3 +598,21 @@
     gap: 12px;
   }
 }
+
+.pd-date-record-cancel-button {
+  width: 100%;
+  min-height: 48px;
+  margin-top: 16px;
+  padding: 0 14px;
+  border: 1.5px solid rgba(208, 90, 85, 0.28);
+  border-radius: 15px;
+  background: #fff4f3;
+  color: #c6534e;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 720;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+.pd-date-record-cancel-button:active { transform: scale(0.98); }
+.pd-date-record-cancel-button:disabled { opacity: 0.4; cursor: not-allowed; }
