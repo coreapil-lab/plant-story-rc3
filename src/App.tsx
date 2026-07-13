@@ -16,6 +16,7 @@ import {
   deleteFertilizedRecord,
   deletePlant,
   deleteWateredRecord,
+  importPlants,
   subscribePlants,
   updateFertilizedAt,
   updatePlant,
@@ -193,6 +194,17 @@ function App() {
     replacePage("home");
   };
 
+  const handleImportPlants = async (importedPlants: Plant[]) => {
+    if (!user) {
+      return {
+        importedCount: 0,
+        skippedCount: importedPlants.length,
+      };
+    }
+
+    return importPlants(user.uid, importedPlants);
+  };
+
   const handleSaveEditPlant = async (values: PlantFormValues) => {
     if (!selectedPlantId) return;
 
@@ -214,12 +226,22 @@ function App() {
   };
 
   const handleQuickWater = async (plant: Plant) => {
-    if (!window.confirm(`${plant.name}에게 오늘 물을 준 것으로 기록할까요?`)) return;
+    if (!window.confirm(`${plant.name}에게 오늘 물을 준 것으로 기록할까요?`)) {
+      return;
+    }
+
     await updateWateredAt(plant.id, getTodayString());
   };
 
   const handleQuickFertilize = async (plant: Plant) => {
-    if (!window.confirm(`${plant.name}에게 오늘 영양제를 준 것으로 기록할까요?`)) return;
+    if (
+      !window.confirm(
+        `${plant.name}에게 오늘 영양제를 준 것으로 기록할까요?`
+      )
+    ) {
+      return;
+    }
+
     await updateFertilizedAt(plant.id, getTodayString());
   };
 
@@ -227,9 +249,25 @@ function App() {
     await deleteWateredRecord(plant.id, date);
   };
 
-  const handleDeleteFertilizerRecord = async (plant: Plant, date: string) => {
+  const handleDeleteFertilizerRecord = async (
+    plant: Plant,
+    date: string
+  ) => {
     await deleteFertilizedRecord(plant.id, date);
   };
+
+  const renderHome = () => (
+    <Home
+      plants={plants}
+      loading={isPlantsLoading}
+      onLogout={handleLogout}
+      onAddPlant={handleAddPlant}
+      onSelectPlant={handleSelectPlant}
+      onQuickWater={handleQuickWater}
+      onQuickFertilize={handleQuickFertilize}
+      onImportPlants={handleImportPlants}
+    />
+  );
 
   if (isAuthLoading) {
     return <div className="app-loading">불러오는 중...</div>;
@@ -267,17 +305,7 @@ function App() {
 
   if (pageMode === "detail") {
     if (!selectedPlant) {
-      return (
-        <Home
-          plants={plants}
-          loading={isPlantsLoading}
-          onLogout={handleLogout}
-          onAddPlant={handleAddPlant}
-          onSelectPlant={handleSelectPlant}
-          onQuickWater={handleQuickWater}
-          onQuickFertilize={handleQuickFertilize}
-        />
-      );
+      return renderHome();
     }
 
     return (
@@ -294,17 +322,7 @@ function App() {
     );
   }
 
-  return (
-    <Home
-      plants={plants}
-      loading={isPlantsLoading}
-      onLogout={handleLogout}
-      onAddPlant={handleAddPlant}
-      onSelectPlant={handleSelectPlant}
-      onQuickWater={handleQuickWater}
-      onQuickFertilize={handleQuickFertilize}
-    />
-  );
+  return renderHome();
 }
 
 export default App;

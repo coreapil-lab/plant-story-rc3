@@ -1,5 +1,14 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import type { Plant } from "../types/plant";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ChangeEvent,
+} from "react";
+import type {
+  Plant,
+  PlantImportResult,
+} from "../types/plant";
 import PlantCard from "../components/PlantCard";
 import "./Home.css";
 
@@ -10,7 +19,16 @@ type HomeProps = {
   onSelectPlant: (plant: Plant) => void;
   onQuickWater: (plant: Plant) => Promise<void>;
   onQuickFertilize: (plant: Plant) => Promise<void>;
+  onImportPlants: (plants: Plant[]) => Promise<PlantImportResult>;
   onLogout: () => Promise<void>;
+};
+
+type BackupFile = {
+  app?: unknown;
+  version?: unknown;
+  exportedAt?: unknown;
+  plantCount?: unknown;
+  plants?: unknown;
 };
 
 function getTodayFileString() {
@@ -68,32 +86,128 @@ function createCsv(plants: Plant[]) {
     "수정일",
   ];
 
-  const rows = plants.map((plant) => {
-    const plantWithHistory = plant as Plant & {
-      wateringHistory?: string[];
-      fertilizingHistory?: string[];
-    };
-
-    return [
+  const rows = plants.map((plant) =>
+    [
       plant.name,
       plant.nickname,
       plant.adoptedAt,
       plant.lastWateredAt,
       plant.wateringIntervalDays,
-      plantWithHistory.wateringHistory ?? [],
+      plant.wateringHistory,
       plant.lastFertilizedAt,
       plant.fertilizingIntervalDays,
-      plantWithHistory.fertilizingHistory ?? [],
+      plant.fertilizingHistory,
       plant.memo,
       plant.imageUrl,
       plant.createdAt,
       plant.updatedAt,
     ]
       .map(escapeCsvValue)
-      .join(",");
-  });
+      .join(",")
+  );
 
   return [headers.map(escapeCsvValue).join(","), ...rows].join("\r\n");
+}
+
+function normalizeString(value: unknown): string {
+  return typeof value === "string" ? value : "";
+}
+
+function normalizeNumber(value: unknown, fallback: number): number {
+  return typeof value === "number" && Number.isFinite(value) && value > 0
+    ? value
+    : fallback;
+}
+
+function normalizeHistory(value: unknown, fallbackDate: string): string[] {
+  const history = Array.isArray(value)
+    ? value.filter(
+        (item): item is string =>
+          typeof item === "string" && item.trim().length > 0
+      )
+    : [];
+
+  if (fallbackDate) {
+    history.push(fallbackDate);
+  }
+
+  return [...new Set(history)].sort((a, b) => a.localeCompare(b));
+}
+
+function parseBackupPlants(value: unknown): Plant[] {
+  const backup = value as BackupFile;
+
+  if (
+    !backup ||
+    typeof backup !== "object" ||
+    backup.app !== "Plant Story" ||
+    !Array.isArray(backup.plants)
+  ) {
+    throw new Error("Plant Story JSON 백업 파일이 아닙니다.");
+  }
+
+  const plants = backup.plants.map((item, index) => {
+    if (!item || typeof item !== "object") {
+      throw new Error(`${index + 1}번째 식물 데이터가 올바르지 않습니다.`);
+    }
+
+    const rawPlant = item as Record<string, unknown>;
+    const name = normalizeString(rawPlant.name).trim();
+
+    if (!name) {
+      throw new Error(`${index + 1}번째 식물의 이름이 없습니다.`);
+    }
+
+    const lastWateredAt = normalizeString(rawPlant.lastWateredAt);
+    const lastFertilizedAt = normalizeString(rawPlant.lastFertilizedAt);
+    const wateringHistory = normalizeHistory(
+      rawPlant.wateringHistory,
+      lastWateredAt
+    );
+    const fertilizingHistory = normalizeHistory(
+      rawPlant.fertilizingHistory,
+      lastFertilizedAt
+    );
+
+    return {
+      id: "",
+      userId: "",
+
+      name,
+      nickname: normalizeString(rawPlant.nickname).trim(),
+
+      imageUrl: normalizeString(rawPlant.imageUrl),
+
+      adoptedAt: normalizeString(rawPlant.adoptedAt),
+
+      lastWateredAt:
+        wateringHistory[wateringHistory.length - 1] ?? "",
+      wateringHistory,
+      wateringIntervalDays: normalizeNumber(
+        rawPlant.wateringIntervalDays,
+        7
+      ),
+
+      lastFertilizedAt:
+        fertilizingHistory[fertilizingHistory.length - 1] ?? "",
+      fertilizingHistory,
+      fertilizingIntervalDays: normalizeNumber(
+        rawPlant.fertilizingIntervalDays,
+        30
+      ),
+
+      memo: normalizeString(rawPlant.memo),
+
+      createdAt: normalizeString(rawPlant.createdAt),
+      updatedAt: normalizeString(rawPlant.updatedAt),
+    };
+  });
+
+  if (plants.length === 0) {
+    throw new Error("백업 파일에 복원할 식물이 없습니다.");
+  }
+
+  return plants;
 }
 
 function Home({
@@ -103,11 +217,14 @@ function Home({
   onSelectPlant,
   onQuickWater,
   onQuickFertilize,
+  onImportPlants,
   onLogout,
 }: HomeProps) {
   const [searchText, setSearchText] = useState("");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isImporting, setIsImporting] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
+  const importInputRef = useRef<HTMLInputElement | null>(null);
 
   const filteredPlants = useMemo(() => {
     const keyword = searchText.trim().toLowerCase();
@@ -159,6 +276,53 @@ function Home({
     setIsMenuOpen(false);
   };
 
+  const handleImportButton = () => {
+    setIsMenuOpen(false);
+    importInputRef.current?.click();
+  };
+
+  const handleJsonImport = async (
+    event: ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+
+    if (!file) return;
+
+    setIsImporting(true);
+
+    try {
+      const fileText = await file.text();
+      const backupData: unknown = JSON.parse(fileText);
+      const importedPlants = parseBackupPlants(backupData);
+
+      const shouldImport = window.confirm(
+        `${importedPlants.length}개의 식물을 가져옵니다.\n` +
+          "현재 식물은 유지되며 중복 식물은 건너뜁니다."
+      );
+
+      if (!shouldImport) return;
+
+      const result = await onImportPlants(importedPlants);
+
+      window.alert(
+        `가져오기 완료\n` +
+          `추가: ${result.importedCount}개\n` +
+          `중복 건너뜀: ${result.skippedCount}개`
+      );
+    } catch (error) {
+      console.error(error);
+
+      window.alert(
+        error instanceof Error
+          ? `가져오기에 실패했습니다.\n${error.message}`
+          : "가져오기에 실패했습니다."
+      );
+    } finally {
+      setIsImporting(false);
+    }
+  };
+
   const handleCsvExport = () => {
     if (plants.length === 0) {
       window.alert("내보낼 식물이 없습니다.");
@@ -200,11 +364,27 @@ function Home({
                   JSON 백업
                 </button>
 
+                <button
+                  type="button"
+                  onClick={handleImportButton}
+                  disabled={isImporting}
+                >
+                  {isImporting ? "가져오는 중" : "JSON 가져오기"}
+                </button>
+
                 <button type="button" onClick={handleCsvExport}>
                   CSV 내보내기
                 </button>
               </div>
             )}
+
+            <input
+              ref={importInputRef}
+              type="file"
+              accept=".json,application/json"
+              onChange={handleJsonImport}
+              hidden
+            />
           </div>
 
           <button

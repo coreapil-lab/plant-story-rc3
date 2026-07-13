@@ -41,3 +41,8 @@ export interface PlantFormValues {
 
   memo: string;
 }
+
+export type PlantImportResult = {
+  importedCount: number;
+  skippedCount: number;
+};
