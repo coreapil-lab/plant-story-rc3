@@ -16,12 +16,17 @@
   box-sizing: border-box;
   -webkit-tap-highlight-color: transparent;
   transition:
-    transform 160ms ease,
-    box-shadow 160ms ease;
+    transform 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.ps-plant-card:focus-visible {
+  outline: 3px solid rgba(85, 164, 104, 0.28);
+  outline-offset: 3px;
 }
 
 .ps-plant-card:active {
-  transform: scale(0.985);
+  transform: scale(0.982);
   box-shadow:
     0 1px 2px rgba(17, 24, 19, 0.02),
     0 5px 16px rgba(17, 24, 19, 0.045);
@@ -32,7 +37,6 @@
   width: 100%;
   aspect-ratio: 4 / 4.65;
   overflow: hidden;
-  border-radius: 0;
   background: #f1f2ef;
 }
 
@@ -40,8 +44,12 @@
   display: block;
   width: 100%;
   height: 100%;
-  border-radius: 0;
   object-fit: cover;
+  transition: transform 280ms ease;
+}
+
+.ps-plant-card:active .ps-card-photo {
+  transform: scale(1.015);
 }
 
 .ps-card-placeholder {
@@ -50,16 +58,10 @@
   justify-content: center;
   width: 100%;
   height: 100%;
-  border-radius: 0;
-  background: linear-gradient(
-    180deg,
-    #f3f4f1 0%,
-    #eceee9 100%
-  );
+  background: linear-gradient(180deg, #f3f4f1 0%, #eceee9 100%);
   font-size: 52px;
   line-height: 1;
 }
-
 
 .ps-card-quick-actions {
   position: absolute;
@@ -80,10 +82,12 @@
   width: 46px;
   height: 46px;
   padding: 0;
-  border: 1px solid rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.74);
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.88);
-  box-shadow: 0 2px 7px rgba(20, 28, 22, 0.13), 0 8px 18px rgba(20, 28, 22, 0.12);
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow:
+    0 2px 7px rgba(20, 28, 22, 0.13),
+    0 8px 18px rgba(20, 28, 22, 0.12);
   font: inherit;
   font-size: 24px;
   line-height: 1;
@@ -92,11 +96,36 @@
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   -webkit-tap-highlight-color: transparent;
+  transition:
+    transform 120ms ease,
+    opacity 120ms ease,
+    box-shadow 120ms ease;
 }
 
-.ps-card-quick-button:active { transform: scale(0.92); }
-.ps-card-quick-button:disabled { opacity: 0.58; cursor: wait; }
-.ps-card-quick-button span { transform: translateY(-1px); }
+.ps-card-quick-button:focus-visible {
+  outline: 3px solid rgba(255, 255, 255, 0.78);
+  outline-offset: 2px;
+}
+
+.ps-card-quick-button:active {
+  transform: scale(0.9);
+  box-shadow:
+    0 1px 4px rgba(20, 28, 22, 0.12),
+    0 4px 10px rgba(20, 28, 22, 0.1);
+}
+
+.ps-card-quick-button:disabled {
+  opacity: 0.58;
+  cursor: wait;
+}
+
+.ps-card-quick-button-loading {
+  animation: ps-quick-pulse 700ms ease-in-out infinite alternate;
+}
+
+.ps-card-quick-button span {
+  transform: translateY(-1px);
+}
 
 .ps-card-content {
   display: flex;
@@ -176,16 +205,48 @@
 }
 
 .ps-card-care-value {
-  color: #6d9b66;
-  font-size: 14px;
-  font-weight: 760;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 27px;
+  padding: 0 9px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 780;
   line-height: 1;
   letter-spacing: -0.2px;
   white-space: nowrap;
+  box-sizing: border-box;
 }
 
-.ps-card-care-value-water {
-  color: #d78248;
+.ps-card-care-status-empty {
+  background: #f2f3f1;
+  color: #8b918b;
+}
+
+.ps-card-care-status-safe {
+  background: #eef7ec;
+  color: #5c8c57;
+}
+
+.ps-card-care-status-today {
+  background: #fff3e8;
+  color: #cb742f;
+}
+
+.ps-card-care-status-overdue {
+  background: #fff0ef;
+  color: #d14f48;
+}
+
+@keyframes ps-quick-pulse {
+  from {
+    transform: scale(0.94);
+  }
+
+  to {
+    transform: scale(1);
+  }
 }
 
 @media (max-width: 420px) {
@@ -193,45 +254,19 @@
     border-radius: 24px;
   }
 
-  
-.ps-card-quick-actions {
-  position: absolute;
-  right: 11px;
-  bottom: 11px;
-  left: 11px;
-  z-index: 2;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  pointer-events: none;
-}
+  .ps-card-quick-actions {
+    right: 9px;
+    bottom: 9px;
+    left: 9px;
+  }
 
-.ps-card-quick-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 46px;
-  height: 46px;
-  padding: 0;
-  border: 1px solid rgba(255, 255, 255, 0.72);
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.88);
-  box-shadow: 0 2px 7px rgba(20, 28, 22, 0.13), 0 8px 18px rgba(20, 28, 22, 0.12);
-  font: inherit;
-  font-size: 24px;
-  line-height: 1;
-  cursor: pointer;
-  pointer-events: auto;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  -webkit-tap-highlight-color: transparent;
-}
+  .ps-card-quick-button {
+    width: 44px;
+    height: 44px;
+    font-size: 23px;
+  }
 
-.ps-card-quick-button:active { transform: scale(0.92); }
-.ps-card-quick-button:disabled { opacity: 0.58; cursor: wait; }
-.ps-card-quick-button span { transform: translateY(-1px); }
-
-.ps-card-content {
+  .ps-card-content {
     padding: 16px 14px 15px;
   }
 
@@ -249,46 +284,14 @@
     border-radius: 22px;
   }
 
-  
-.ps-card-quick-actions {
-  position: absolute;
-  right: 11px;
-  bottom: 11px;
-  left: 11px;
-  z-index: 2;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  pointer-events: none;
-}
+  .ps-card-quick-button {
+    width: 42px;
+    height: 42px;
+    font-size: 22px;
+  }
 
-.ps-card-quick-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 46px;
-  height: 46px;
-  padding: 0;
-  border: 1px solid rgba(255, 255, 255, 0.72);
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.88);
-  box-shadow: 0 2px 7px rgba(20, 28, 22, 0.13), 0 8px 18px rgba(20, 28, 22, 0.12);
-  font: inherit;
-  font-size: 24px;
-  line-height: 1;
-  cursor: pointer;
-  pointer-events: auto;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  -webkit-tap-highlight-color: transparent;
-}
-
-.ps-card-quick-button:active { transform: scale(0.92); }
-.ps-card-quick-button:disabled { opacity: 0.58; cursor: wait; }
-.ps-card-quick-button span { transform: translateY(-1px); }
-
-.ps-card-content {
-    padding: 14px 12px 14px;
+  .ps-card-content {
+    padding: 14px 12px;
   }
 
   .ps-card-name {
@@ -304,15 +307,20 @@
   }
 
   .ps-card-care-value {
-    font-size: 13px;
+    min-height: 25px;
+    padding: 0 8px;
+    font-size: 12px;
   }
 }
 
-@media (max-width: 420px) {
-  .ps-card-quick-actions { right: 9px; bottom: 9px; left: 9px; }
-  .ps-card-quick-button { width: 44px; height: 44px; font-size: 23px; }
-}
+@media (prefers-reduced-motion: reduce) {
+  .ps-plant-card,
+  .ps-card-photo,
+  .ps-card-quick-button {
+    transition: none;
+  }
 
-@media (max-width: 360px) {
-  .ps-card-quick-button { width: 42px; height: 42px; font-size: 22px; }
+  .ps-card-quick-button-loading {
+    animation: none;
+  }
 }
