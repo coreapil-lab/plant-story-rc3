@@ -1,4 +1,9 @@
-import { useEffect, useState } from "react";
+import {
+  lazy,
+  Suspense,
+  useEffect,
+  useState,
+} from "react";
 import type { User } from "firebase/auth";
 import {
   onAuthStateChanged,
@@ -9,6 +14,7 @@ import "./App.css";
 
 import { auth } from "./firebase";
 import type { Plant, PlantFormValues } from "./types/plant";
+import type { PlantGuide as PlantGuideItem } from "./types/plantGuide";
 import {
   createPlant,
   deleteFertilizedRecord,
@@ -26,9 +32,11 @@ import AddEditPlant from "./pages/AddEditPlant";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import PlantDetail from "./pages/PlantDetail";
-import PlantGuide from "./pages/PlantGuide";
-import PlantGuideDetail from "./pages/PlantGuideDetail";
-import { plantGuideData } from "./data/plantGuideData";
+
+const PlantGuide = lazy(() => import("./pages/PlantGuide"));
+const PlantGuideDetail = lazy(
+  () => import("./pages/PlantGuideDetail")
+);
 
 type PageMode =
   | "home"
@@ -73,6 +81,14 @@ function clearPlantGuideState() {
   sessionStorage.removeItem(GUIDE_STATE_STORAGE_KEY);
 }
 
+function GuideLoading() {
+  return (
+    <div className="app-loading">
+      🌿 식물 정보를 불러오는 중...
+    </div>
+  );
+}
+
 function App() {
   const [user, setUser] = useState<User | null>(null);
   const [plants, setPlants] = useState<Plant[]>([]);
@@ -83,14 +99,15 @@ function App() {
   const [selectedGuideId, setSelectedGuideId] = useState<string | null>(
     null
   );
+  const [selectedGuide, setSelectedGuide] =
+    useState<PlantGuideItem | null>(null);
   const [isAuthLoading, setIsAuthLoading] = useState(true);
   const [isPlantsLoading, setIsPlantsLoading] = useState(false);
+  const [isGuideLookupLoading, setIsGuideLookupLoading] =
+    useState(false);
 
   const selectedPlant =
     plants.find((plant) => plant.id === selectedPlantId) ?? null;
-
-  const selectedGuide =
-    plantGuideData.find((plant) => plant.id === selectedGuideId) ?? null;
 
   useEffect(() => {
     clearPlantGuideState();
@@ -107,6 +124,7 @@ function App() {
         setPageMode("home");
         setSelectedPlantId(null);
         setSelectedGuideId(null);
+        setSelectedGuide(null);
 
         window.history.replaceState(
           createHistoryState("home"),
@@ -153,16 +171,22 @@ function App() {
         setPageMode("home");
         setSelectedPlantId(null);
         setSelectedGuideId(null);
+        setSelectedGuide(null);
         return;
       }
 
       if (state.pageMode === "home") {
         clearPlantGuideState();
+        setSelectedGuide(null);
       }
 
       setPageMode(state.pageMode);
       setSelectedPlantId(state.plantId);
       setSelectedGuideId(state.guideId);
+
+      if (state.pageMode !== "guideDetail") {
+        setSelectedGuide(null);
+      }
     };
 
     window.addEventListener("popstate", handlePopState);
@@ -171,6 +195,47 @@ function App() {
       window.removeEventListener("popstate", handlePopState);
     };
   }, []);
+
+  useEffect(() => {
+    if (
+      pageMode !== "guideDetail" ||
+      !selectedGuideId ||
+      selectedGuide?.id === selectedGuideId
+    ) {
+      return;
+    }
+
+    let cancelled = false;
+
+    const loadSelectedGuide = async () => {
+      setIsGuideLookupLoading(true);
+
+      try {
+        const { plantGuideData } = await import(
+          "./data/plantGuideData"
+        );
+
+        if (cancelled) return;
+
+        const foundGuide =
+          plantGuideData.find(
+            (plant) => plant.id === selectedGuideId
+          ) ?? null;
+
+        setSelectedGuide(foundGuide);
+      } finally {
+        if (!cancelled) {
+          setIsGuideLookupLoading(false);
+        }
+      }
+    };
+
+    void loadSelectedGuide();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [pageMode, selectedGuideId, selectedGuide]);
 
   const movePage = (
     nextPageMode: PageMode,
@@ -206,11 +271,18 @@ function App() {
 
   const moveToHomeAndResetGuide = () => {
     clearPlantGuideState();
+    setSelectedGuide(null);
     movePage("home");
+  };
+
+  const handleOpenGuideDetail = (plant: PlantGuideItem) => {
+    setSelectedGuide(plant);
+    movePage("guideDetail", null, plant.id);
   };
 
   const handleLogout = async () => {
     clearPlantGuideState();
+    setSelectedGuide(null);
     await signOut(auth);
   };
 
@@ -364,27 +436,26 @@ function App() {
   }
 
   if (pageMode === "guideDetail") {
-    if (!selectedGuide) {
-      replacePage("guide");
-      return null;
+    if (isGuideLookupLoading || !selectedGuide) {
+      return <GuideLoading />;
     }
 
     return (
-      <PlantGuideDetail
-        plant={selectedGuide}
-        onBack={() => movePage("guide")}
-      />
+      <Suspense fallback={<GuideLoading />}>
+        <PlantGuideDetail
+          plant={selectedGuide}
+          onBack={() => movePage("guide")}
+        />
+      </Suspense>
     );
   }
 
   if (pageMode === "guide") {
     return (
       <>
-        <PlantGuide
-          onSelectPlant={(plant) =>
-            movePage("guideDetail", null, plant.id)
-          }
-        />
+        <Suspense fallback={<GuideLoading />}>
+          <PlantGuide onSelectPlant={handleOpenGuideDetail} />
+        </Suspense>
 
         <BottomTabBar
           activeTab="guide"
