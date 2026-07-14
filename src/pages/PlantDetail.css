@@ -135,7 +135,7 @@
 
 .pd-info-list {
   overflow: hidden;
-  border: 1px solid rgba(99, 145, 89, 0.12);
+  border: 1.5px solid rgba(74, 125, 84, 0.28);
   border-radius: 22px;
   background: #ffffff;
   box-shadow: 0 10px 26px rgba(57, 100, 64, 0.07);
@@ -148,7 +148,7 @@
   gap: 14px;
   min-height: 58px;
   padding: 0 17px;
-  border-bottom: 1px solid rgba(38, 75, 49, 0.075);
+ border-bottom: 1px solid rgba(38, 75, 49, 0.12);
 }
 
 .pd-info-row:last-child {
@@ -183,7 +183,7 @@
   min-height: 76px;
   margin: 0;
   padding: 17px;
-  border: 1px solid rgba(99, 145, 89, 0.12);
+  border: 1.5px solid rgba(74, 125, 84, 0.28);
   border-radius: 22px;
   background: #ffffff;
   color: #536257;
@@ -230,8 +230,9 @@
 }
 
 .pd-delete-button {
-  background: #fff1f0;
-  color: #c94f49;
+  background: #ffecec;
+  border: 1.5px solid #ef9b9b;
+  color: #c43d3d;
 }
 
 .pd-date-modal-backdrop {
@@ -254,6 +255,7 @@
   padding: 22px;
   border-radius: 28px;
   background: #ffffff;
+  border: 1.5px solid rgba(74, 125, 84, 0.24);
   box-shadow: 0 24px 70px rgba(20, 35, 24, 0.2);
   box-sizing: border-box;
 }
