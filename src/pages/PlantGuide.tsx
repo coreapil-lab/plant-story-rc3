@@ -18,6 +18,13 @@ type LightFilter =
   | "반양지"
   | "양지";
 
+type SortOption =
+  | "전체"
+  | "쉬움"
+  | "어려움"
+  | "이름"
+  | "성장";
+
 const PAGE_SIZE = 20;
 
 const LIGHT_FILTERS: LightFilter[] = [
@@ -27,6 +34,23 @@ const LIGHT_FILTERS: LightFilter[] = [
   "반양지",
   "양지",
 ];
+
+const SORT_OPTIONS: SortOption[] = [
+  "전체",
+  "쉬움",
+  "어려움",
+  "이름",
+  "성장",
+];
+
+const GROWTH_SPEED_ORDER: Record<
+  PlantGuideItem["growthSpeed"],
+  number
+> = {
+  빠름: 0,
+  보통: 1,
+  느림: 2,
+};
 
 function createSearchText(plant: PlantGuideItem) {
   return [
@@ -51,11 +75,54 @@ function matchesLightFilter(
   return plant.light.includes(lightFilter);
 }
 
+function sortPlants(
+  plants: PlantGuideItem[],
+  sortOption: SortOption
+) {
+  const nextPlants = [...plants];
+
+  if (sortOption === "쉬움") {
+    return nextPlants.sort(
+      (a, b) =>
+        a.difficulty - b.difficulty ||
+        a.name.localeCompare(b.name, "ko")
+    );
+  }
+
+  if (sortOption === "어려움") {
+    return nextPlants.sort(
+      (a, b) =>
+        b.difficulty - a.difficulty ||
+        a.name.localeCompare(b.name, "ko")
+    );
+  }
+
+  if (sortOption === "이름") {
+    return nextPlants.sort((a, b) =>
+      a.name.localeCompare(b.name, "ko")
+    );
+  }
+
+  if (sortOption === "성장") {
+    return nextPlants.sort(
+      (a, b) =>
+        GROWTH_SPEED_ORDER[a.growthSpeed] -
+          GROWTH_SPEED_ORDER[b.growthSpeed] ||
+        a.difficulty - b.difficulty ||
+        a.name.localeCompare(b.name, "ko")
+    );
+  }
+
+  return nextPlants;
+}
+
 function PlantGuide({ onSelectPlant }: PlantGuideProps) {
   const [searchText, setSearchText] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("전체");
   const [selectedLight, setSelectedLight] =
     useState<LightFilter>("전체");
+  const [sortOption, setSortOption] =
+    useState<SortOption>("전체");
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
   const categories = useMemo(
@@ -71,7 +138,7 @@ function PlantGuide({ onSelectPlant }: PlantGuideProps) {
   const filteredPlants = useMemo(() => {
     const keyword = searchText.trim().toLowerCase();
 
-    return plantGuideData.filter((plant) => {
+    const matches = plantGuideData.filter((plant) => {
       const matchesKeyword =
         !keyword || createSearchText(plant).includes(keyword);
 
@@ -86,14 +153,39 @@ function PlantGuide({ onSelectPlant }: PlantGuideProps) {
 
       return matchesKeyword && matchesCategory && matchesLight;
     });
-  }, [searchText, selectedCategory, selectedLight]);
+
+    return sortPlants(matches, sortOption);
+  }, [
+    searchText,
+    selectedCategory,
+    selectedLight,
+    sortOption,
+  ]);
 
   const visiblePlants = filteredPlants.slice(0, visibleCount);
   const hasMore = visibleCount < filteredPlants.length;
 
   useEffect(() => {
     setVisibleCount(PAGE_SIZE);
-  }, [searchText, selectedCategory, selectedLight]);
+  }, [
+    searchText,
+    selectedCategory,
+    selectedLight,
+    sortOption,
+  ]);
+
+  const resetFilters = () => {
+    setSearchText("");
+    setSelectedCategory("전체");
+    setSelectedLight("전체");
+    setSortOption("전체");
+  };
+
+  const hasActiveFilter =
+    selectedCategory !== "전체" ||
+    selectedLight !== "전체" ||
+    sortOption !== "전체" ||
+    Boolean(searchText.trim());
 
   return (
     <div className="plant-guide-page">
@@ -115,6 +207,31 @@ function PlantGuide({ onSelectPlant }: PlantGuideProps) {
           aria-label="식물정보 검색"
         />
       </div>
+
+      <section className="plant-guide-filter-section">
+        <strong className="plant-guide-filter-title">정렬</strong>
+
+        <div
+          className="plant-guide-filter-scroll"
+          role="group"
+          aria-label="식물 정렬"
+        >
+          {SORT_OPTIONS.map((option) => (
+            <button
+              key={option}
+              type="button"
+              className={
+                sortOption === option
+                  ? "plant-guide-filter-button plant-guide-filter-button-active"
+                  : "plant-guide-filter-button"
+              }
+              onClick={() => setSortOption(option)}
+            >
+              {option}
+            </button>
+          ))}
+        </div>
+      </section>
 
       <section className="plant-guide-filter-section">
         <strong className="plant-guide-filter-title">식물 분류</strong>
@@ -171,17 +288,11 @@ function PlantGuide({ onSelectPlant }: PlantGuideProps) {
           검색 결과 {filteredPlants.length}개
         </p>
 
-        {(selectedCategory !== "전체" ||
-          selectedLight !== "전체" ||
-          searchText.trim()) && (
+        {hasActiveFilter && (
           <button
             type="button"
             className="plant-guide-filter-reset"
-            onClick={() => {
-              setSearchText("");
-              setSelectedCategory("전체");
-              setSelectedLight("전체");
-            }}
+            onClick={resetFilters}
           >
             필터 초기화
           </button>
