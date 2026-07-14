@@ -31,6 +31,7 @@ function getDaysFrom(dateString: string) {
 
 function formatDPlus(days: number | null) {
   if (days === null) return "기록 없음";
+
   return `D+${days}`;
 }
 
@@ -39,9 +40,37 @@ function getCareStatus(
   intervalDays: number
 ): CareStatus {
   if (days === null) return "empty";
-  if (days > intervalDays) return "overdue";
-  if (days === intervalDays) return "today";
+
+  if (days > intervalDays) {
+    return "overdue";
+  }
+
+  if (days === intervalDays) {
+    return "today";
+  }
+
   return "safe";
+}
+
+function getCloudinaryThumbnailUrl(imageUrl: string) {
+  if (!imageUrl) return "";
+
+  const uploadSegment = "/image/upload/";
+
+  if (
+    !imageUrl.includes("res.cloudinary.com") ||
+    !imageUrl.includes(uploadSegment)
+  ) {
+    return imageUrl;
+  }
+
+  const transformation =
+    "w_420,h_500,c_fill,g_auto,f_auto,q_auto";
+
+  return imageUrl.replace(
+    uploadSegment,
+    `${uploadSegment}${transformation}/`
+  );
 }
 
 function PlantCard({
@@ -52,18 +81,26 @@ function PlantCard({
 }: PlantCardProps) {
   const wateredDays = getDaysFrom(plant.lastWateredAt);
   const fertilizedDays = getDaysFrom(plant.lastFertilizedAt);
+
   const waterStatus = getCareStatus(
     wateredDays,
     plant.wateringIntervalDays
   );
+
   const fertilizerStatus = getCareStatus(
     fertilizedDays,
     plant.fertilizingIntervalDays
   );
 
-  const [quickAction, setQuickAction] = useState<QuickAction | null>(null);
+  const thumbnailUrl = getCloudinaryThumbnailUrl(plant.imageUrl);
 
-  const handleCardKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+  const [quickAction, setQuickAction] = useState<QuickAction | null>(
+    null
+  );
+
+  const handleCardKeyDown = (
+    event: KeyboardEvent<HTMLDivElement>
+  ) => {
     if (event.key !== "Enter" && event.key !== " ") return;
 
     event.preventDefault();
@@ -104,11 +141,16 @@ function PlantCard({
         {plant.imageUrl ? (
           <img
             className="ps-card-photo"
-            src={plant.imageUrl}
+            src={thumbnailUrl}
             alt={plant.name}
+            loading="lazy"
+            decoding="async"
           />
         ) : (
-          <div className="ps-card-placeholder" aria-hidden="true">
+          <div
+            className="ps-card-placeholder"
+            aria-hidden="true"
+          >
             🌿
           </div>
         )}
@@ -159,6 +201,7 @@ function PlantCard({
       <div className="ps-card-content">
         <div className="ps-card-heading">
           <div className="ps-card-name">{plant.name}</div>
+
           <div className="ps-card-nickname">
             {plant.nickname || "별명 없음"}
           </div>
@@ -169,7 +212,10 @@ function PlantCard({
         <div className="ps-card-care-list">
           <div className="ps-card-care-row">
             <span className="ps-card-care-label">
-              <span className="ps-card-care-icon" aria-hidden="true">
+              <span
+                className="ps-card-care-icon"
+                aria-hidden="true"
+              >
                 💧
               </span>
               물주기
@@ -184,7 +230,10 @@ function PlantCard({
 
           <div className="ps-card-care-row">
             <span className="ps-card-care-label">
-              <span className="ps-card-care-icon" aria-hidden="true">
+              <span
+                className="ps-card-care-icon"
+                aria-hidden="true"
+              >
                 🌱
               </span>
               영양제
