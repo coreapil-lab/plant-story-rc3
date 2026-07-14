@@ -1,4 +1,8 @@
-import { useMemo, useState } from "react";
+import {
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { plantGuideData } from "../data/plantGuideData";
 import type { PlantGuide as PlantGuideItem } from "../types/plantGuide";
 import "./PlantGuide.css";
@@ -6,6 +10,23 @@ import "./PlantGuide.css";
 type PlantGuideProps = {
   onSelectPlant: (plant: PlantGuideItem) => void;
 };
+
+type LightFilter =
+  | "전체"
+  | "음지"
+  | "반음지"
+  | "반양지"
+  | "양지";
+
+const PAGE_SIZE = 20;
+
+const LIGHT_FILTERS: LightFilter[] = [
+  "전체",
+  "음지",
+  "반음지",
+  "반양지",
+  "양지",
+];
 
 function createSearchText(plant: PlantGuideItem) {
   return [
@@ -21,23 +42,67 @@ function createSearchText(plant: PlantGuideItem) {
     .toLowerCase();
 }
 
+function matchesLightFilter(
+  plant: PlantGuideItem,
+  lightFilter: LightFilter
+) {
+  if (lightFilter === "전체") return true;
+
+  return plant.light.includes(lightFilter);
+}
+
 function PlantGuide({ onSelectPlant }: PlantGuideProps) {
   const [searchText, setSearchText] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("전체");
+  const [selectedLight, setSelectedLight] =
+    useState<LightFilter>("전체");
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+
+  const categories = useMemo(
+    () => [
+      "전체",
+      ...Array.from(
+        new Set(plantGuideData.map((plant) => plant.category))
+      ).sort((a, b) => a.localeCompare(b, "ko")),
+    ],
+    []
+  );
 
   const filteredPlants = useMemo(() => {
     const keyword = searchText.trim().toLowerCase();
-    if (!keyword) return plantGuideData;
-    return plantGuideData.filter((plant) =>
-      createSearchText(plant).includes(keyword)
-    );
-  }, [searchText]);
+
+    return plantGuideData.filter((plant) => {
+      const matchesKeyword =
+        !keyword || createSearchText(plant).includes(keyword);
+
+      const matchesCategory =
+        selectedCategory === "전체" ||
+        plant.category === selectedCategory;
+
+      const matchesLight = matchesLightFilter(
+        plant,
+        selectedLight
+      );
+
+      return matchesKeyword && matchesCategory && matchesLight;
+    });
+  }, [searchText, selectedCategory, selectedLight]);
+
+  const visiblePlants = filteredPlants.slice(0, visibleCount);
+  const hasMore = visibleCount < filteredPlants.length;
+
+  useEffect(() => {
+    setVisibleCount(PAGE_SIZE);
+  }, [searchText, selectedCategory, selectedLight]);
 
   return (
     <div className="plant-guide-page">
       <header className="plant-guide-header">
         <div>
           <h1>식물정보</h1>
-          <p>실내에서 자주 키우는 식물 {plantGuideData.length}종</p>
+          <p>
+            실내에서 자주 키우는 식물 {plantGuideData.length}종
+          </p>
         </div>
       </header>
 
@@ -51,44 +116,139 @@ function PlantGuide({ onSelectPlant }: PlantGuideProps) {
         />
       </div>
 
-      <p className="plant-guide-result-count">
-        {searchText.trim()
-          ? `검색 결과 ${filteredPlants.length}개`
-          : `전체 ${filteredPlants.length}개`}
-      </p>
+      <section className="plant-guide-filter-section">
+        <strong className="plant-guide-filter-title">식물 분류</strong>
 
-      {filteredPlants.length > 0 ? (
-        <main className="plant-guide-list">
-          {filteredPlants.map((plant) => (
+        <div
+          className="plant-guide-filter-scroll"
+          role="group"
+          aria-label="식물 분류 필터"
+        >
+          {categories.map((category) => (
             <button
-              key={plant.id}
+              key={category}
               type="button"
-              className="plant-guide-card"
-              onClick={() => onSelectPlant(plant)}
+              className={
+                selectedCategory === category
+                  ? "plant-guide-filter-button plant-guide-filter-button-active"
+                  : "plant-guide-filter-button"
+              }
+              onClick={() => setSelectedCategory(category)}
             >
-              <span className="plant-guide-emoji" aria-hidden="true">
-                {plant.emoji}
-              </span>
-
-              <span className="plant-guide-card-content">
-                <strong>{plant.name}</strong>
-                <small>{plant.scientificName}</small>
-                <span className="plant-guide-card-meta">
-                  {plant.category} · 난이도 {plant.difficulty}/7
-                </span>
-              </span>
-
-              <span className="plant-guide-chevron" aria-hidden="true">›</span>
+              {category}
             </button>
           ))}
-        </main>
+        </div>
+      </section>
+
+      <section className="plant-guide-filter-section">
+        <strong className="plant-guide-filter-title">빛 환경</strong>
+
+        <div
+          className="plant-guide-filter-scroll"
+          role="group"
+          aria-label="빛 환경 필터"
+        >
+          {LIGHT_FILTERS.map((light) => (
+            <button
+              key={light}
+              type="button"
+              className={
+                selectedLight === light
+                  ? "plant-guide-filter-button plant-guide-filter-button-active"
+                  : "plant-guide-filter-button"
+              }
+              onClick={() => setSelectedLight(light)}
+            >
+              {light}
+            </button>
+          ))}
+        </div>
+      </section>
+
+      <div className="plant-guide-result-row">
+        <p className="plant-guide-result-count">
+          검색 결과 {filteredPlants.length}개
+        </p>
+
+        {(selectedCategory !== "전체" ||
+          selectedLight !== "전체" ||
+          searchText.trim()) && (
+          <button
+            type="button"
+            className="plant-guide-filter-reset"
+            onClick={() => {
+              setSearchText("");
+              setSelectedCategory("전체");
+              setSelectedLight("전체");
+            }}
+          >
+            필터 초기화
+          </button>
+        )}
+      </div>
+
+      {visiblePlants.length > 0 ? (
+        <>
+          <main className="plant-guide-list">
+            {visiblePlants.map((plant) => (
+              <button
+                key={plant.id}
+                type="button"
+                className="plant-guide-card"
+                onClick={() => onSelectPlant(plant)}
+              >
+                <span
+                  className="plant-guide-card-emoji"
+                  aria-hidden="true"
+                >
+                  {plant.emoji}
+                </span>
+
+                <span className="plant-guide-card-copy">
+                  <h2>{plant.name}</h2>
+                  <p>{plant.scientificName}</p>
+                  <span className="plant-guide-card-meta">
+                    {plant.category} · 난이도 {plant.difficulty}/7
+                  </span>
+                </span>
+
+                <span
+                  className="plant-guide-chevron"
+                  aria-hidden="true"
+                >
+                  ›
+                </span>
+              </button>
+            ))}
+          </main>
+
+          {hasMore && (
+            <button
+              type="button"
+              className="plant-guide-more-button"
+              onClick={() =>
+                setVisibleCount(
+                  (currentCount) => currentCount + PAGE_SIZE
+                )
+              }
+            >
+              더 보기
+              <span>
+                {visiblePlants.length}/{filteredPlants.length}
+              </span>
+            </button>
+          )}
+        </>
       ) : (
-        <div className="plant-guide-empty">검색 결과가 없습니다.</div>
+        <div className="plant-guide-empty">
+          조건에 맞는 식물이 없습니다.
+        </div>
       )}
 
       <p className="plant-guide-disclaimer">
-        온도·습도와 관리 조건은 일반적인 실내 재배 기준이며, 품종과 계절,
-        주거 환경에 따라 달라질 수 있습니다.
+        온도·습도와 관리 조건은 일반적인 실내 재배 기준이며,
+        품종과 계절, 주거 환경에 따라 달라질 수 있습니다.
       </p>
     </div>
   );
