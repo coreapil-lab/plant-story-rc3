@@ -25,7 +25,17 @@ type SortOption =
   | "이름"
   | "성장";
 
+type SavedGuideState = {
+  searchText: string;
+  selectedCategory: string;
+  selectedLight: LightFilter;
+  sortOption: SortOption;
+  visibleCount: number;
+  scrollY: number;
+};
+
 const PAGE_SIZE = 20;
+const STORAGE_KEY = "plant-story-guide-state";
 
 const LIGHT_FILTERS: LightFilter[] = [
   "전체",
@@ -51,6 +61,57 @@ const GROWTH_SPEED_ORDER: Record<
   보통: 1,
   느림: 2,
 };
+
+const DEFAULT_STATE: SavedGuideState = {
+  searchText: "",
+  selectedCategory: "전체",
+  selectedLight: "전체",
+  sortOption: "전체",
+  visibleCount: PAGE_SIZE,
+  scrollY: 0,
+};
+
+function loadSavedState(): SavedGuideState {
+  try {
+    const savedValue = sessionStorage.getItem(STORAGE_KEY);
+
+    if (!savedValue) return DEFAULT_STATE;
+
+    const parsed = JSON.parse(savedValue) as Partial<SavedGuideState>;
+
+    return {
+      searchText:
+        typeof parsed.searchText === "string"
+          ? parsed.searchText
+          : DEFAULT_STATE.searchText,
+      selectedCategory:
+        typeof parsed.selectedCategory === "string"
+          ? parsed.selectedCategory
+          : DEFAULT_STATE.selectedCategory,
+      selectedLight:
+        parsed.selectedLight &&
+        LIGHT_FILTERS.includes(parsed.selectedLight)
+          ? parsed.selectedLight
+          : DEFAULT_STATE.selectedLight,
+      sortOption:
+        parsed.sortOption &&
+        SORT_OPTIONS.includes(parsed.sortOption)
+          ? parsed.sortOption
+          : DEFAULT_STATE.sortOption,
+      visibleCount:
+        typeof parsed.visibleCount === "number" &&
+        parsed.visibleCount >= PAGE_SIZE
+          ? parsed.visibleCount
+          : DEFAULT_STATE.visibleCount,
+      scrollY:
+        typeof parsed.scrollY === "number" && parsed.scrollY >= 0
+          ? parsed.scrollY
+          : DEFAULT_STATE.scrollY,
+    };
+  } catch {
+    return DEFAULT_STATE;
+  }
+}
 
 function createSearchText(plant: PlantGuideItem) {
   return [
@@ -117,13 +178,21 @@ function sortPlants(
 }
 
 function PlantGuide({ onSelectPlant }: PlantGuideProps) {
-  const [searchText, setSearchText] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("전체");
+  const savedState = useMemo(loadSavedState, []);
+
+  const [searchText, setSearchText] = useState(
+    savedState.searchText
+  );
+  const [selectedCategory, setSelectedCategory] = useState(
+    savedState.selectedCategory
+  );
   const [selectedLight, setSelectedLight] =
-    useState<LightFilter>("전체");
+    useState<LightFilter>(savedState.selectedLight);
   const [sortOption, setSortOption] =
-    useState<SortOption>("전체");
-  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+    useState<SortOption>(savedState.sortOption);
+  const [visibleCount, setVisibleCount] = useState(
+    savedState.visibleCount
+  );
 
   const categories = useMemo(
     () => [
@@ -166,19 +235,77 @@ function PlantGuide({ onSelectPlant }: PlantGuideProps) {
   const hasMore = visibleCount < filteredPlants.length;
 
   useEffect(() => {
-    setVisibleCount(PAGE_SIZE);
+    const nextState: SavedGuideState = {
+      searchText,
+      selectedCategory,
+      selectedLight,
+      sortOption,
+      visibleCount,
+      scrollY: window.scrollY,
+    };
+
+    sessionStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify(nextState)
+    );
   }, [
     searchText,
     selectedCategory,
     selectedLight,
     sortOption,
+    visibleCount,
   ]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const nextState: SavedGuideState = {
+        searchText,
+        selectedCategory,
+        selectedLight,
+        sortOption,
+        visibleCount,
+        scrollY: window.scrollY,
+      };
+
+      sessionStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(nextState)
+      );
+    };
+
+    window.addEventListener("scroll", handleScroll, {
+      passive: true,
+    });
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [
+    searchText,
+    selectedCategory,
+    selectedLight,
+    sortOption,
+    visibleCount,
+  ]);
+
+  useEffect(() => {
+    window.requestAnimationFrame(() => {
+      window.scrollTo({
+        top: savedState.scrollY,
+        behavior: "auto",
+      });
+    });
+  }, [savedState.scrollY]);
 
   const resetFilters = () => {
     setSearchText("");
     setSelectedCategory("전체");
     setSelectedLight("전체");
     setSortOption("전체");
+    setVisibleCount(PAGE_SIZE);
+
+    sessionStorage.removeItem(STORAGE_KEY);
+    window.scrollTo({ top: 0, behavior: "auto" });
   };
 
   const hasActiveFilter =
@@ -202,7 +329,10 @@ function PlantGuide({ onSelectPlant }: PlantGuideProps) {
         <span aria-hidden="true">🔍</span>
         <input
           value={searchText}
-          onChange={(event) => setSearchText(event.target.value)}
+          onChange={(event) => {
+            setSearchText(event.target.value);
+            setVisibleCount(PAGE_SIZE);
+          }}
           placeholder="식물명, 학명, 반양지 등으로 검색"
           aria-label="식물정보 검색"
         />
@@ -225,7 +355,10 @@ function PlantGuide({ onSelectPlant }: PlantGuideProps) {
                   ? "plant-guide-filter-button plant-guide-filter-button-active"
                   : "plant-guide-filter-button"
               }
-              onClick={() => setSortOption(option)}
+              onClick={() => {
+                setSortOption(option);
+                setVisibleCount(PAGE_SIZE);
+              }}
             >
               {option}
             </button>
@@ -250,7 +383,10 @@ function PlantGuide({ onSelectPlant }: PlantGuideProps) {
                   ? "plant-guide-filter-button plant-guide-filter-button-active"
                   : "plant-guide-filter-button"
               }
-              onClick={() => setSelectedCategory(category)}
+              onClick={() => {
+                setSelectedCategory(category);
+                setVisibleCount(PAGE_SIZE);
+              }}
             >
               {category}
             </button>
@@ -275,7 +411,10 @@ function PlantGuide({ onSelectPlant }: PlantGuideProps) {
                   ? "plant-guide-filter-button plant-guide-filter-button-active"
                   : "plant-guide-filter-button"
               }
-              onClick={() => setSelectedLight(light)}
+              onClick={() => {
+                setSelectedLight(light);
+                setVisibleCount(PAGE_SIZE);
+              }}
             >
               {light}
             </button>

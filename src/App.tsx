@@ -45,6 +45,8 @@ type PlantStoryHistoryState = {
   guideId: string | null;
 };
 
+const GUIDE_STATE_STORAGE_KEY = "plant-story-guide-state";
+
 function getTodayString() {
   const today = new Date();
   const year = today.getFullYear();
@@ -67,6 +69,10 @@ function createHistoryState(
   };
 }
 
+function clearPlantGuideState() {
+  sessionStorage.removeItem(GUIDE_STATE_STORAGE_KEY);
+}
+
 function App() {
   const [user, setUser] = useState<User | null>(null);
   const [plants, setPlants] = useState<Plant[]>([]);
@@ -87,11 +93,16 @@ function App() {
     plantGuideData.find((plant) => plant.id === selectedGuideId) ?? null;
 
   useEffect(() => {
+    clearPlantGuideState();
+  }, []);
+
+  useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
       setIsAuthLoading(false);
 
       if (!currentUser) {
+        clearPlantGuideState();
         setPlants([]);
         setPageMode("home");
         setSelectedPlantId(null);
@@ -138,10 +149,15 @@ function App() {
       const state = event.state as PlantStoryHistoryState | null;
 
       if (!state?.plantStory) {
+        clearPlantGuideState();
         setPageMode("home");
         setSelectedPlantId(null);
         setSelectedGuideId(null);
         return;
+      }
+
+      if (state.pageMode === "home") {
+        clearPlantGuideState();
       }
 
       setPageMode(state.pageMode);
@@ -188,7 +204,13 @@ function App() {
     );
   };
 
+  const moveToHomeAndResetGuide = () => {
+    clearPlantGuideState();
+    movePage("home");
+  };
+
   const handleLogout = async () => {
+    clearPlantGuideState();
     await signOut(auth);
   };
 
@@ -366,7 +388,7 @@ function App() {
 
         <BottomTabBar
           activeTab="guide"
-          onHome={() => movePage("home")}
+          onHome={moveToHomeAndResetGuide}
           onGuide={() => replacePage("guide")}
         />
       </>
