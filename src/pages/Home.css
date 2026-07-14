@@ -5,7 +5,7 @@
   margin: 0 auto;
   padding:
     14px 14px
-    calc(110px + env(safe-area-inset-bottom));
+    calc(160px + env(safe-area-inset-bottom));
   background: #f6fbf3;
   overflow-x: hidden;
   box-sizing: border-box;
@@ -201,7 +201,7 @@
 .floating-add-button {
   position: fixed;
   right: max(18px, env(safe-area-inset-right));
-  bottom: calc(22px + env(safe-area-inset-bottom));
+  bottom: calc(92px + env(safe-area-inset-bottom));
   width: 58px;
   height: 58px;
   padding: 0;

@@ -227,22 +227,36 @@ function PlantDetail({
 
   const handleDeleteSelectedRecord = async () => {
     if (!dateAction || !selectedDate) return;
-    const hasRecord = dateAction === "water"
-      ? plant.wateringHistory.includes(selectedDate)
-      : plant.fertilizingHistory.includes(selectedDate);
+
+    const hasRecord =
+      dateAction === "water"
+        ? plant.wateringHistory.includes(selectedDate)
+        : plant.fertilizingHistory.includes(selectedDate);
+
     if (!hasRecord) {
-      alert("선택한 날짜에 취소할 기록이 없습니다.");
+      window.alert("선택한 날짜에 취소할 기록이 없습니다.");
       return;
     }
+
     const label = dateAction === "water" ? "물주기" : "영양제";
-    if (!window.confirm(`${selectedDate} ${label} 기록을 취소할까요?`)) return;
+
+    if (
+      !window.confirm(
+        `${selectedDate} ${label} 기록을 취소할까요?`
+      )
+    ) {
+      return;
+    }
+
     setSavingDate(true);
+
     try {
       if (dateAction === "water") {
         await onDeleteWaterRecord(plant, selectedDate);
       } else {
         await onDeleteFertilizerRecord(plant, selectedDate);
       }
+
       setDateAction(null);
     } finally {
       setSavingDate(false);
@@ -571,7 +585,13 @@ function PlantDetail({
               type="button"
               className="pd-date-record-cancel-button"
               onClick={handleDeleteSelectedRecord}
-              disabled={savingDate || !selectedDate || (dateAction === "water" ? !plant.wateringHistory.includes(selectedDate) : !plant.fertilizingHistory.includes(selectedDate))}
+              disabled={
+                savingDate ||
+                !selectedDate ||
+                (dateAction === "water"
+                  ? !plant.wateringHistory.includes(selectedDate)
+                  : !plant.fertilizingHistory.includes(selectedDate))
+              }
             >
               선택한 {dateAction === "water" ? "물주기" : "영양제"} 기록 취소
             </button>

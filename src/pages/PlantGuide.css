@@ -1,0 +1,140 @@
+.plant-guide-page {
+  width: 100%;
+  min-height: 100dvh;
+  max-width: 560px;
+  margin: 0 auto;
+  padding:
+    14px 14px
+    calc(110px + env(safe-area-inset-bottom));
+  background: #f6fbf3;
+  box-sizing: border-box;
+}
+
+.plant-guide-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  padding: 10px 0 14px;
+  background: rgba(246, 251, 243, 0.94);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.plant-guide-header h1 {
+  margin: 0;
+  color: #173d25;
+  font-size: 25px;
+  font-weight: 950;
+  letter-spacing: -0.7px;
+}
+
+.plant-guide-header p {
+  margin: 6px 0 0;
+  color: #6f826f;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.plant-guide-search {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 52px;
+  margin: 8px 0 18px;
+  padding: 0 15px;
+  border: 1px solid rgba(99, 145, 89, 0.12);
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow: 0 10px 26px rgba(57, 100, 64, 0.08);
+}
+
+.plant-guide-search span {
+  font-size: 17px;
+}
+
+.plant-guide-search input {
+  width: 100%;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #173d25;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.plant-guide-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.plant-guide-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 16px;
+  border: 1px solid rgba(99, 145, 89, 0.12);
+  border-radius: 20px;
+  background: #ffffff;
+  box-shadow: 0 10px 24px rgba(57, 100, 64, 0.07);
+  text-align: left;
+  cursor: pointer;
+}
+
+.plant-guide-card:active {
+  transform: scale(0.985);
+}
+
+.plant-guide-card-emoji {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 58px;
+  height: 58px;
+  border-radius: 17px;
+  background: #eef7ea;
+  font-size: 32px;
+}
+
+.plant-guide-card-copy {
+  min-width: 0;
+}
+
+.plant-guide-card-copy h2 {
+  margin: 0;
+  color: #21482f;
+  font-size: 18px;
+  font-weight: 900;
+}
+
+.plant-guide-card-copy p {
+  margin: 5px 0 0;
+  color: #7f897f;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.plant-guide-empty {
+  padding: 32px 18px;
+  border-radius: 20px;
+  background: #ffffff;
+  color: #6c776d;
+  font-size: 15px;
+  font-weight: 800;
+  text-align: center;
+  box-shadow: 0 10px 24px rgba(57, 100, 64, 0.07);
+}
+
+@media (max-width: 420px) {
+  .plant-guide-page {
+    padding-right: 12px;
+    padding-left: 12px;
+  }
+
+  .plant-guide-header h1 {
+    font-size: 23px;
+  }
+}
