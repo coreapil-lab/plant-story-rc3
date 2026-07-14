@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import type { PlantGuide } from "../types/plantGuide";
 import "./PlantGuideDetail.css";
 
@@ -48,6 +49,13 @@ function PlantGuideDetail({
   plant,
   onBack,
 }: PlantGuideDetailProps) {
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: "auto",
+    });
+  }, []);
+
   return (
     <div className="plant-guide-detail-page">
       <header className="guide-detail-header">
