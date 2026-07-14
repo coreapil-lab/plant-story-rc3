@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { TouchEvent } from "react";
 import type { Plant } from "../types/plant";
 import "./PlantDetail.css";
@@ -121,6 +121,13 @@ function PlantDetail({
   onDeleteWaterRecord,
   onDeleteFertilizerRecord,
 }: PlantDetailProps) {
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: "auto",
+    });
+  }, []);
+
   const adoptedDays = getDaysFrom(plant.adoptedAt);
   const [dateAction, setDateAction] = useState<DateAction | null>(null);
   const [selectedDate, setSelectedDate] = useState(getTodayString());
