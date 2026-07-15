@@ -1,4 +1,4 @@
-import {
+﻿import {
   lazy,
   Suspense,
   useEffect,
@@ -84,7 +84,7 @@ function clearPlantGuideState() {
 function GuideLoading() {
   return (
     <div className="app-loading">
-      🌿 식물 정보를 불러오는 중...
+      ?뙼 ?앸Ъ ?뺣낫瑜?遺덈윭?ㅻ뒗 以?..
     </div>
   );
 }
@@ -211,15 +211,17 @@ function App() {
       setIsGuideLookupLoading(true);
 
       try {
-        const { plantGuideData } = await import(
-          "./data/plantGuideData"
+        const { loadPlantGuideData } = await import(
+          "./data/plants"
         );
+        const plantGuideData = await loadPlantGuideData();
 
         if (cancelled) return;
 
         const foundGuide =
           plantGuideData.find(
-            (plant) => plant.id === selectedGuideId
+            (plant: PlantGuideItem) =>
+              plant.id === selectedGuideId
           ) ?? null;
 
         setSelectedGuide(foundGuide);
@@ -329,7 +331,7 @@ function App() {
 
   const handleQuickWater = async (plant: Plant) => {
     const shouldRecord = window.confirm(
-      `${plant.name}에게 오늘 물을 준 것으로 기록할까요?`
+      `${plant.name}?먭쾶 ?ㅻ뒛 臾쇱쓣 以 寃껋쑝濡?湲곕줉?좉퉴??`
     );
 
     if (!shouldRecord) return;
@@ -339,7 +341,7 @@ function App() {
 
   const handleQuickFertilize = async (plant: Plant) => {
     const shouldRecord = window.confirm(
-      `${plant.name}에게 오늘 영양제를 준 것으로 기록할까요?`
+      `${plant.name}?먭쾶 ?ㅻ뒛 ?곸뼇?쒕? 以 寃껋쑝濡?湲곕줉?좉퉴??`
     );
 
     if (!shouldRecord) return;
@@ -383,7 +385,7 @@ function App() {
   );
 
   if (isAuthLoading) {
-    return <div className="app-loading">불러오는 중...</div>;
+    return <div className="app-loading">遺덈윭?ㅻ뒗 以?..</div>;
   }
 
   if (!user) {

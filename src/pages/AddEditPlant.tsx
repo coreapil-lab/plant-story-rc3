@@ -22,10 +22,32 @@ const emptyForm: PlantFormValues = {
   imageUrl: "",
 };
 
+function getCloudinaryThumbnailUrl(imageUrl: string) {
+  if (!imageUrl) return "";
+
+  const uploadSegment = "/image/upload/";
+
+  if (
+    !imageUrl.includes("res.cloudinary.com") ||
+    !imageUrl.includes(uploadSegment)
+  ) {
+    return imageUrl;
+  }
+
+  const transformation =
+    "w_420,h_500,c_fill,g_auto,f_auto,q_auto";
+
+  return imageUrl.replace(
+    uploadSegment,
+    `${uploadSegment}${transformation}/`
+  );
+}
+
 function AddEditPlant({ plant, onSave, onCancel }: AddEditPlantProps) {
   const [form, setForm] = useState<PlantFormValues>(emptyForm);
   const [saving, setSaving] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
+  const thumbnailUrl = getCloudinaryThumbnailUrl(form.imageUrl);
 
   useEffect(() => {
     if (!plant) {
@@ -147,8 +169,10 @@ function AddEditPlant({ plant, onSave, onCancel }: AddEditPlantProps) {
                 {form.imageUrl ? (
                   <img
                     className="ae-photo-image"
-                    src={form.imageUrl}
+                    src={thumbnailUrl}
                     alt={form.name || "식물 사진"}
+                    loading="lazy"
+                    decoding="async"
                   />
                 ) : (
                   <div className="ae-photo-placeholder">

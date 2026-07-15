@@ -3,7 +3,11 @@ import {
   useMemo,
   useState,
 } from "react";
-import { plantGuideData } from "../data/plantGuideData";
+import {
+  loadPlantGuideData,
+  PLANT_GUIDE_CATEGORIES,
+  PLANT_GUIDE_TOTAL_COUNT,
+} from "../data/plants";
 import type { PlantGuide as PlantGuideItem } from "../types/plantGuide";
 import "./PlantGuide.css";
 
@@ -180,6 +184,12 @@ function sortPlants(
 function PlantGuide({ onSelectPlant }: PlantGuideProps) {
   const savedState = useMemo(loadSavedState, []);
 
+  const [plantGuideData, setPlantGuideData] = useState<
+    PlantGuideItem[]
+  >([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
+
   const [searchText, setSearchText] = useState(
     savedState.searchText
   );
@@ -195,14 +205,39 @@ function PlantGuide({ onSelectPlant }: PlantGuideProps) {
   );
 
   const categories = useMemo(
-    () => [
-      "전체",
-      ...Array.from(
-        new Set(plantGuideData.map((plant) => plant.category))
-      ).sort((a, b) => a.localeCompare(b, "ko")),
-    ],
+    () => ["전체", ...PLANT_GUIDE_CATEGORIES],
     []
   );
+
+  useEffect(() => {
+    let isMounted = true;
+
+    setIsLoading(true);
+    setLoadError("");
+
+    loadPlantGuideData()
+      .then((plants) => {
+        if (!isMounted) return;
+
+        setPlantGuideData(plants);
+      })
+      .catch(() => {
+        if (!isMounted) return;
+
+        setLoadError(
+          "식물정보를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요."
+        );
+      })
+      .finally(() => {
+        if (!isMounted) return;
+
+        setIsLoading(false);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const filteredPlants = useMemo(() => {
     const keyword = searchText.trim().toLowerCase();
@@ -229,6 +264,7 @@ function PlantGuide({ onSelectPlant }: PlantGuideProps) {
     selectedCategory,
     selectedLight,
     sortOption,
+    plantGuideData,
   ]);
 
   const visiblePlants = filteredPlants.slice(0, visibleCount);
@@ -320,7 +356,7 @@ function PlantGuide({ onSelectPlant }: PlantGuideProps) {
         <div>
           <h1>식물정보</h1>
           <p>
-            실내에서 자주 키우는 식물 {plantGuideData.length}종
+            실내에서 자주 키우는 식물 {PLANT_GUIDE_TOTAL_COUNT}종
           </p>
         </div>
       </header>
@@ -438,7 +474,13 @@ function PlantGuide({ onSelectPlant }: PlantGuideProps) {
         )}
       </div>
 
-      {visiblePlants.length > 0 ? (
+      {isLoading ? (
+        <div className="plant-guide-empty">
+          식물정보를 불러오는 중입니다.
+        </div>
+      ) : loadError ? (
+        <div className="plant-guide-empty">{loadError}</div>
+      ) : visiblePlants.length > 0 ? (
         <>
           <main className="plant-guide-list">
             {visiblePlants.map((plant) => (

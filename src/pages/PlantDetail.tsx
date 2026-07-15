@@ -111,6 +111,27 @@ function createCalendarDays(monthStart: Date): CalendarDay[] {
   });
 }
 
+function getCloudinaryThumbnailUrl(imageUrl: string) {
+  if (!imageUrl) return "";
+
+  const uploadSegment = "/image/upload/";
+
+  if (
+    !imageUrl.includes("res.cloudinary.com") ||
+    !imageUrl.includes(uploadSegment)
+  ) {
+    return imageUrl;
+  }
+
+  const transformation =
+    "w_420,h_500,c_fill,g_auto,f_auto,q_auto";
+
+  return imageUrl.replace(
+    uploadSegment,
+    `${uploadSegment}${transformation}/`
+  );
+}
+
 function PlantDetail({
   plant,
   onBack,
@@ -129,6 +150,7 @@ function PlantDetail({
   }, []);
 
   const adoptedDays = getDaysFrom(plant.adoptedAt);
+  const thumbnailUrl = getCloudinaryThumbnailUrl(plant.imageUrl);
   const [dateAction, setDateAction] = useState<DateAction | null>(null);
   const [selectedDate, setSelectedDate] = useState(getTodayString());
   const [calendarMonth, setCalendarMonth] = useState(
@@ -319,8 +341,10 @@ function PlantDetail({
               {plant.imageUrl ? (
                 <img
                   className="pd-photo-image"
-                  src={plant.imageUrl}
+                  src={thumbnailUrl}
                   alt={plant.name}
+                  loading="lazy"
+                  decoding="async"
                 />
               ) : (
                 <div className="pd-photo-placeholder">
