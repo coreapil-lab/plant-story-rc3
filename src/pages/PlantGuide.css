@@ -84,16 +84,11 @@
 
 .plant-guide-filter-scroll {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
   width: 100%;
   padding-bottom: 2px;
-  overflow-x: auto;
-  scrollbar-width: none;
-  -webkit-overflow-scrolling: touch;
-}
-
-.plant-guide-filter-scroll::-webkit-scrollbar {
-  display: none;
+  overflow: visible;
 }
 
 .plant-guide-filter-button {
