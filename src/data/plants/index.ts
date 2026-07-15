@@ -1,6 +1,6 @@
 import type { PlantGuide } from "../../types/plantGuide";
 
-export const PLANT_GUIDE_TOTAL_COUNT = 200;
+export const PLANT_GUIDE_TOTAL_COUNT = 300;
 
 export const PLANT_GUIDE_CATEGORIES = [
   "과실·관엽식물",
@@ -49,6 +49,7 @@ const plantModuleLoaders = [
   () => import("./fruitPlants"),
   () => import("./fernPlants"),
   () => import("./specialtyPlants"),
+  () => import("./additionalPlants"),
 ];
 
 let cachedPlants: PlantGuide[] | null = null;
