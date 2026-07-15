@@ -83,6 +83,13 @@ function AddEditPlant({ plant, onSave, onCancel }: AddEditPlantProps) {
     }
   };
 
+  const handleImageDelete = () => {
+    setForm((prev) => ({
+      ...prev,
+      imageUrl: "",
+    }));
+  };
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
@@ -123,6 +130,7 @@ function AddEditPlant({ plant, onSave, onCancel }: AddEditPlantProps) {
             type="button"
             className="ae-header-button"
             onClick={onCancel}
+            disabled={saving || uploadingImage}
           >
             뒤로
           </button>
@@ -157,16 +165,33 @@ function AddEditPlant({ plant, onSave, onCancel }: AddEditPlantProps) {
                 )}
               </div>
 
-              <label className="ae-photo-button">
-                {uploadingImage ? "업로드 중" : "사진 변경"}
+              <div className="ae-photo-actions">
+                <label className="ae-photo-button">
+                  {uploadingImage
+                    ? "업로드 중"
+                    : form.imageUrl
+                      ? "사진 변경"
+                      : "사진 선택"}
 
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                  disabled={saving || uploadingImage}
-                />
-              </label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    disabled={saving || uploadingImage}
+                  />
+                </label>
+
+                {form.imageUrl && (
+                  <button
+                    type="button"
+                    className="ae-photo-button ae-photo-delete-button"
+                    onClick={handleImageDelete}
+                    disabled={saving || uploadingImage}
+                  >
+                    사진 삭제
+                  </button>
+                )}
+              </div>
             </div>
 
             <div className="ae-profile-fields">
@@ -291,6 +316,15 @@ function AddEditPlant({ plant, onSave, onCancel }: AddEditPlantProps) {
                 : saving
                   ? "저장 중"
                   : "저장하기"}
+            </button>
+
+            <button
+              type="button"
+              className="ae-cancel-button"
+              onClick={onCancel}
+              disabled={saving || uploadingImage}
+            >
+              취소
             </button>
           </div>
         </main>
