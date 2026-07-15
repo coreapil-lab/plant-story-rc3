@@ -85,7 +85,7 @@
 .plant-guide-filter-scroll {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 6px;
   width: 100%;
   padding-bottom: 2px;
   overflow: visible;
@@ -94,13 +94,13 @@
 .plant-guide-filter-button {
   flex: 0 0 auto;
   min-height: 38px;
-  padding: 0 14px;
+  padding: 0 10px;
   border: 1px solid rgba(99, 145, 89, 0.14);
   border-radius: 999px;
   background: #ffffff;
   color: #607066;
   font: inherit;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 850;
   cursor: pointer;
   box-shadow: 0 6px 16px rgba(57, 100, 64, 0.05);
