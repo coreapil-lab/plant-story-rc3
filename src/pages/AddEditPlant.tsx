@@ -62,18 +62,13 @@ function AddEditPlant({ plant, onSave, onCancel }: AddEditPlantProps) {
 
   const handleImageChange = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-
     if (!file) return;
 
     setUploadingImage(true);
 
     try {
       const imageUrl = await uploadPlantImage(file);
-
-      setForm((prev) => ({
-        ...prev,
-        imageUrl,
-      }));
+      setForm((prev) => ({ ...prev, imageUrl }));
     } catch (error) {
       console.error(error);
       alert("사진 업로드에 실패했습니다. 다시 시도해 주세요.");
@@ -84,10 +79,7 @@ function AddEditPlant({ plant, onSave, onCancel }: AddEditPlantProps) {
   };
 
   const handleImageDelete = () => {
-    setForm((prev) => ({
-      ...prev,
-      imageUrl: "",
-    }));
+    setForm((prev) => ({ ...prev, imageUrl: "" }));
   };
 
   const handleSubmit = async (e: FormEvent) => {
@@ -172,7 +164,6 @@ function AddEditPlant({ plant, onSave, onCancel }: AddEditPlantProps) {
                     : form.imageUrl
                       ? "사진 변경"
                       : "사진 선택"}
-
                   <input
                     type="file"
                     accept="image/*"
@@ -197,7 +188,6 @@ function AddEditPlant({ plant, onSave, onCancel }: AddEditPlantProps) {
             <div className="ae-profile-fields">
               <div className="ae-profile-field">
                 <label htmlFor="ae-name">식물 이름</label>
-
                 <input
                   id="ae-name"
                   name="name"
@@ -209,7 +199,6 @@ function AddEditPlant({ plant, onSave, onCancel }: AddEditPlantProps) {
 
               <div className="ae-profile-field">
                 <label htmlFor="ae-nickname">별명</label>
-
                 <input
                   id="ae-nickname"
                   name="nickname"
@@ -224,10 +213,9 @@ function AddEditPlant({ plant, onSave, onCancel }: AddEditPlantProps) {
           <section className="ae-section">
             <h2 className="ae-section-title">관리 정보</h2>
 
-            <div className="ae-care-grid">
-              <div className="ae-form-group ae-form-group-full">
+            <div className="ae-info-card">
+              <div className="ae-info-row ae-info-row-full">
                 <label htmlFor="ae-adopted-at">📅 입양일</label>
-
                 <input
                   id="ae-adopted-at"
                   type="date"
@@ -237,56 +225,56 @@ function AddEditPlant({ plant, onSave, onCancel }: AddEditPlantProps) {
                 />
               </div>
 
-              <div className="ae-form-group">
-                <label htmlFor="ae-watered-at">💧 물 준 날짜</label>
+              <div className="ae-info-row">
+                <div className="ae-info-field">
+                  <label htmlFor="ae-watered-at">💧 물 준 날짜</label>
+                  <input
+                    id="ae-watered-at"
+                    type="date"
+                    name="lastWateredAt"
+                    value={form.lastWateredAt}
+                    onChange={handleChange}
+                  />
+                </div>
 
-                <input
-                  id="ae-watered-at"
-                  type="date"
-                  name="lastWateredAt"
-                  value={form.lastWateredAt}
-                  onChange={handleChange}
-                />
+                <div className="ae-info-field">
+                  <label htmlFor="ae-watering-interval">💧 물주기</label>
+                  <input
+                    id="ae-watering-interval"
+                    type="number"
+                    name="wateringIntervalDays"
+                    min="1"
+                    value={form.wateringIntervalDays}
+                    onChange={handleChange}
+                  />
+                </div>
               </div>
 
-              <div className="ae-form-group">
-                <label htmlFor="ae-watering-interval">💧 물주기</label>
+              <div className="ae-info-row">
+                <div className="ae-info-field">
+                  <label htmlFor="ae-fertilized-at">🌱 최근 영양제</label>
+                  <input
+                    id="ae-fertilized-at"
+                    type="date"
+                    name="lastFertilizedAt"
+                    value={form.lastFertilizedAt}
+                    onChange={handleChange}
+                  />
+                </div>
 
-                <input
-                  id="ae-watering-interval"
-                  type="number"
-                  name="wateringIntervalDays"
-                  min="1"
-                  value={form.wateringIntervalDays}
-                  onChange={handleChange}
-                />
-              </div>
-
-              <div className="ae-form-group">
-                <label htmlFor="ae-fertilized-at">🌱 최근 영양제</label>
-
-                <input
-                  id="ae-fertilized-at"
-                  type="date"
-                  name="lastFertilizedAt"
-                  value={form.lastFertilizedAt}
-                  onChange={handleChange}
-                />
-              </div>
-
-              <div className="ae-form-group">
-                <label htmlFor="ae-fertilizing-interval">
-                  🌱 영양제 주기
-                </label>
-
-                <input
-                  id="ae-fertilizing-interval"
-                  type="number"
-                  name="fertilizingIntervalDays"
-                  min="1"
-                  value={form.fertilizingIntervalDays}
-                  onChange={handleChange}
-                />
+                <div className="ae-info-field">
+                  <label htmlFor="ae-fertilizing-interval">
+                    🌱 영양제 주기
+                  </label>
+                  <input
+                    id="ae-fertilizing-interval"
+                    type="number"
+                    name="fertilizingIntervalDays"
+                    min="1"
+                    value={form.fertilizingIntervalDays}
+                    onChange={handleChange}
+                  />
+                </div>
               </div>
             </div>
           </section>
@@ -294,7 +282,7 @@ function AddEditPlant({ plant, onSave, onCancel }: AddEditPlantProps) {
           <section className="ae-section">
             <h2 className="ae-section-title">메모</h2>
 
-            <div className="ae-form-group">
+            <div className="ae-memo-card">
               <textarea
                 name="memo"
                 value={form.memo}
