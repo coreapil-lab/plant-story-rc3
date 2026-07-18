@@ -84,7 +84,7 @@ function clearPlantGuideState() {
 function GuideLoading() {
   return (
     <div className="app-loading">
-      🌿 식물 정보를 불러오는 중...
+      식물 정보를 불러오는 중...
     </div>
   );
 }
@@ -211,9 +211,10 @@ function App() {
       setIsGuideLookupLoading(true);
 
       try {
-        const { plantGuideData } = await import(
+        const { loadPlantGuideData } = await import(
           "./data/plants"
         );
+        const plantGuideData = await loadPlantGuideData();
 
         if (cancelled) return;
 
