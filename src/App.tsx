@@ -2,7 +2,6 @@
   lazy,
   Suspense,
   useEffect,
-  useRef,
   useState,
 } from "react";
 import type { User } from "firebase/auth";
@@ -52,7 +51,6 @@ type PlantStoryHistoryState = {
   pageMode: PageMode;
   plantId: string | null;
   guideId: string | null;
-  exitGuard?: boolean;
 };
 
 const GUIDE_STATE_STORAGE_KEY = "plant-story-guide-state";
@@ -86,7 +84,7 @@ function clearPlantGuideState() {
 function GuideLoading() {
   return (
     <div className="app-loading">
-      식물 정보를 불러오는 중...
+      🌿 식물 정보를 불러오는 중...
     </div>
   );
 }
@@ -107,10 +105,6 @@ function App() {
   const [isPlantsLoading, setIsPlantsLoading] = useState(false);
   const [isGuideLookupLoading, setIsGuideLookupLoading] =
     useState(false);
-  const [showExitToast, setShowExitToast] = useState(false);
-
-  const exitReadyRef = useRef(false);
-  const exitTimerRef = useRef<number | null>(null);
 
   const selectedPlant =
     plants.find((plant) => plant.id === selectedPlantId) ?? null;
@@ -163,71 +157,14 @@ function App() {
   }, [user]);
 
   useEffect(() => {
-    const clearExitTimer = () => {
-      if (exitTimerRef.current !== null) {
-        window.clearTimeout(exitTimerRef.current);
-        exitTimerRef.current = null;
-      }
-    };
-
-    const resetExitReady = () => {
-      clearExitTimer();
-      exitReadyRef.current = false;
-      setShowExitToast(false);
-    };
-
-    const baseHomeState = createHistoryState("home");
-    const guardedHomeState: PlantStoryHistoryState = {
-      ...baseHomeState,
-      exitGuard: true,
-    };
-
     window.history.replaceState(
-      baseHomeState,
-      "",
-      window.location.href
-    );
-    window.history.pushState(
-      guardedHomeState,
+      createHistoryState("home"),
       "",
       window.location.href
     );
 
     const handlePopState = (event: PopStateEvent) => {
       const state = event.state as PlantStoryHistoryState | null;
-
-      const reachedHomeExitBoundary =
-        state?.plantStory === true &&
-        state.pageMode === "home" &&
-        state.exitGuard !== true;
-
-      if (reachedHomeExitBoundary) {
-        if (exitReadyRef.current) {
-          resetExitReady();
-          window.history.back();
-          return;
-        }
-
-        exitReadyRef.current = true;
-        setShowExitToast(true);
-
-        window.history.pushState(
-          guardedHomeState,
-          "",
-          window.location.href
-        );
-
-        clearExitTimer();
-        exitTimerRef.current = window.setTimeout(() => {
-          exitReadyRef.current = false;
-          setShowExitToast(false);
-          exitTimerRef.current = null;
-        }, 2000);
-
-        return;
-      }
-
-      resetExitReady();
 
       if (!state?.plantStory) {
         clearPlantGuideState();
@@ -255,7 +192,6 @@ function App() {
     window.addEventListener("popstate", handlePopState);
 
     return () => {
-      clearExitTimer();
       window.removeEventListener("popstate", handlePopState);
     };
   }, []);
@@ -275,10 +211,9 @@ function App() {
       setIsGuideLookupLoading(true);
 
       try {
-        const { loadPlantGuideData } = await import(
+        const { plantGuideData } = await import(
           "./data/plants"
         );
-        const plantGuideData = await loadPlantGuideData();
 
         if (cancelled) return;
 
@@ -445,34 +380,6 @@ function App() {
         onHome={() => replacePage("home")}
         onGuide={() => movePage("guide")}
       />
-
-      {showExitToast && (
-        <div
-          role="status"
-          aria-live="polite"
-          style={{
-            position: "fixed",
-            left: "50%",
-            bottom: "calc(88px + env(safe-area-inset-bottom))",
-            zIndex: 9999,
-            width: "max-content",
-            maxWidth: "calc(100vw - 32px)",
-            padding: "10px 15px",
-            borderRadius: "14px",
-            background: "rgba(38, 43, 39, 0.82)",
-            color: "rgba(255, 255, 255, 0.88)",
-            fontSize: "14px",
-            fontWeight: 650,
-            lineHeight: 1.4,
-            textAlign: "center",
-            boxShadow: "0 8px 24px rgba(0, 0, 0, 0.18)",
-            transform: "translateX(-50%)",
-            pointerEvents: "none",
-          }}
-        >
-          한 번 더 뒤로가기를 누르면 앱이 종료됩니다.
-        </div>
-      )}
     </>
   );
 
