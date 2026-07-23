@@ -144,38 +144,6 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if (!user || pageMode !== "home") return;
-
-    const currentState = window.history
-      .state as PlantStoryHistoryState | null;
-
-    if (
-      currentState?.plantStory === true &&
-      currentState.pageMode === "home" &&
-      currentState.exitGuard === true
-    ) {
-      return;
-    }
-
-    const baseHomeState = createHistoryState("home");
-    const guardedHomeState: PlantStoryHistoryState = {
-      ...baseHomeState,
-      exitGuard: true,
-    };
-
-    window.history.replaceState(
-      baseHomeState,
-      "",
-      window.location.href
-    );
-    window.history.pushState(
-      guardedHomeState,
-      "",
-      window.location.href
-    );
-  }, [user, pageMode]);
-
-  useEffect(() => {
     if (!user) return;
 
     setIsPlantsLoading(true);
@@ -195,6 +163,8 @@ function App() {
   }, [user]);
 
   useEffect(() => {
+    if (!user) return;
+
     const clearExitTimer = () => {
       if (exitTimerRef.current !== null) {
         window.clearTimeout(exitTimerRef.current);
@@ -208,22 +178,13 @@ function App() {
       setShowExitToast(false);
     };
 
+    const baseUrl = `${window.location.pathname}${window.location.search}`;
+    const guardUrl = `${baseUrl}#plant-story-app`;
     const baseHomeState = createHistoryState("home");
     const guardedHomeState: PlantStoryHistoryState = {
       ...baseHomeState,
       exitGuard: true,
     };
-
-    window.history.replaceState(
-      baseHomeState,
-      "",
-      window.location.href
-    );
-    window.history.pushState(
-      guardedHomeState,
-      "",
-      window.location.href
-    );
 
     const handlePopState = (event: PopStateEvent) => {
       const state = event.state as PlantStoryHistoryState | null;
@@ -246,7 +207,7 @@ function App() {
         window.history.pushState(
           guardedHomeState,
           "",
-          window.location.href
+          guardUrl
         );
 
         clearExitTimer();
@@ -286,11 +247,14 @@ function App() {
 
     window.addEventListener("popstate", handlePopState);
 
+    window.history.replaceState(baseHomeState, "", baseUrl);
+    window.history.pushState(guardedHomeState, "", guardUrl);
+
     return () => {
       clearExitTimer();
       window.removeEventListener("popstate", handlePopState);
     };
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     if (
