@@ -52,7 +52,7 @@ type PlantStoryHistoryState = {
   pageMode: PageMode;
   plantId: string | null;
   guideId: string | null;
-  exitGuard: boolean;
+  exitGuard?: boolean;
 };
 
 const GUIDE_STATE_STORAGE_KEY = "plant-story-guide-state";
@@ -69,15 +69,13 @@ function getTodayString() {
 function createHistoryState(
   pageMode: PageMode,
   plantId: string | null = null,
-  guideId: string | null = null,
-  exitGuard = false
+  guideId: string | null = null
 ): PlantStoryHistoryState {
   return {
     plantStory: true,
     pageMode,
     plantId,
     guideId,
-    exitGuard,
   };
 }
 
@@ -111,7 +109,7 @@ function App() {
     useState(false);
   const [showExitToast, setShowExitToast] = useState(false);
 
-  const exitArmedRef = useRef(false);
+  const exitReadyRef = useRef(false);
   const exitTimerRef = useRef<number | null>(null);
 
   const selectedPlant =
@@ -165,23 +163,32 @@ function App() {
   }, [user]);
 
   useEffect(() => {
-    const clearExitState = () => {
-      exitArmedRef.current = false;
-      setShowExitToast(false);
-
+    const clearExitTimer = () => {
       if (exitTimerRef.current !== null) {
         window.clearTimeout(exitTimerRef.current);
         exitTimerRef.current = null;
       }
     };
 
+    const resetExitReady = () => {
+      clearExitTimer();
+      exitReadyRef.current = false;
+      setShowExitToast(false);
+    };
+
+    const baseHomeState = createHistoryState("home");
+    const guardedHomeState: PlantStoryHistoryState = {
+      ...baseHomeState,
+      exitGuard: true,
+    };
+
     window.history.replaceState(
-      createHistoryState("home", null, null, false),
+      baseHomeState,
       "",
       window.location.href
     );
     window.history.pushState(
-      createHistoryState("home", null, null, true),
+      guardedHomeState,
       "",
       window.location.href
     );
@@ -189,37 +196,30 @@ function App() {
     const handlePopState = (event: PopStateEvent) => {
       const state = event.state as PlantStoryHistoryState | null;
 
-      if (!state?.plantStory) {
-        return;
-      }
+      const reachedHomeExitBoundary =
+        state?.plantStory === true &&
+        state.pageMode === "home" &&
+        state.exitGuard !== true;
 
-      const isHomeExitBoundary =
-        state.pageMode === "home" && !state.exitGuard;
-
-      if (isHomeExitBoundary) {
-        if (exitArmedRef.current) {
-          clearExitState();
-          window.setTimeout(() => {
-            window.history.back();
-          }, 0);
+      if (reachedHomeExitBoundary) {
+        if (exitReadyRef.current) {
+          resetExitReady();
+          window.history.back();
           return;
         }
 
-        exitArmedRef.current = true;
-        setPageMode("home");
-        setSelectedPlantId(null);
-        setSelectedGuideId(null);
-        setSelectedGuide(null);
+        exitReadyRef.current = true;
         setShowExitToast(true);
 
         window.history.pushState(
-          createHistoryState("home", null, null, true),
+          guardedHomeState,
           "",
           window.location.href
         );
 
+        clearExitTimer();
         exitTimerRef.current = window.setTimeout(() => {
-          exitArmedRef.current = false;
+          exitReadyRef.current = false;
           setShowExitToast(false);
           exitTimerRef.current = null;
         }, 2000);
@@ -227,7 +227,16 @@ function App() {
         return;
       }
 
-      clearExitState();
+      resetExitReady();
+
+      if (!state?.plantStory) {
+        clearPlantGuideState();
+        setPageMode("home");
+        setSelectedPlantId(null);
+        setSelectedGuideId(null);
+        setSelectedGuide(null);
+        return;
+      }
 
       if (state.pageMode === "home") {
         clearPlantGuideState();
@@ -246,7 +255,7 @@ function App() {
     window.addEventListener("popstate", handlePopState);
 
     return () => {
-      clearExitState();
+      clearExitTimer();
       window.removeEventListener("popstate", handlePopState);
     };
   }, []);
@@ -304,12 +313,7 @@ function App() {
     setSelectedGuideId(guideId);
 
     window.history.pushState(
-      createHistoryState(
-        nextPageMode,
-        plantId,
-        guideId,
-        nextPageMode === "home"
-      ),
+      createHistoryState(nextPageMode, plantId, guideId),
       "",
       window.location.href
     );
@@ -325,12 +329,7 @@ function App() {
     setSelectedGuideId(guideId);
 
     window.history.replaceState(
-      createHistoryState(
-        nextPageMode,
-        plantId,
-        guideId,
-        nextPageMode === "home"
-      ),
+      createHistoryState(nextPageMode, plantId, guideId),
       "",
       window.location.href
     );
@@ -448,7 +447,29 @@ function App() {
       />
 
       {showExitToast && (
-        <div className="app-exit-toast" role="status" aria-live="polite">
+        <div
+          role="status"
+          aria-live="polite"
+          style={{
+            position: "fixed",
+            left: "50%",
+            bottom: "calc(88px + env(safe-area-inset-bottom))",
+            zIndex: 9999,
+            width: "max-content",
+            maxWidth: "calc(100vw - 32px)",
+            padding: "10px 15px",
+            borderRadius: "14px",
+            background: "rgba(38, 43, 39, 0.82)",
+            color: "rgba(255, 255, 255, 0.88)",
+            fontSize: "14px",
+            fontWeight: 650,
+            lineHeight: 1.4,
+            textAlign: "center",
+            boxShadow: "0 8px 24px rgba(0, 0, 0, 0.18)",
+            transform: "translateX(-50%)",
+            pointerEvents: "none",
+          }}
+        >
           한 번 더 뒤로가기를 누르면 앱이 종료됩니다.
         </div>
       )}
