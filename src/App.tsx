@@ -2,6 +2,7 @@
   lazy,
   Suspense,
   useEffect,
+  useLayoutEffect,
   useRef,
   useState,
 } from "react";
@@ -111,8 +112,6 @@ function App() {
 
   const exitReadyRef = useRef(false);
   const exitTimerRef = useRef<number | null>(null);
-  const pageModeRef = useRef<PageMode>("home");
-  const lastBackHandledAtRef = useRef(0);
 
   const selectedPlant =
     plants.find((plant) => plant.id === selectedPlantId) ?? null;
@@ -120,10 +119,6 @@ function App() {
   useEffect(() => {
     clearPlantGuideState();
   }, []);
-
-  useEffect(() => {
-    pageModeRef.current = pageMode;
-  }, [pageMode]);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -168,9 +163,7 @@ function App() {
     return () => unsubscribe();
   }, [user]);
 
-  useEffect(() => {
-    if (!user) return;
-
+  useLayoutEffect(() => {
     const clearExitTimer = () => {
       if (exitTimerRef.current !== null) {
         window.clearTimeout(exitTimerRef.current);
@@ -185,39 +178,66 @@ function App() {
     };
 
     const baseUrl = `${window.location.pathname}${window.location.search}`;
-    const guardUrl = `${baseUrl}#plant-story-app`;
     const baseHomeState = createHistoryState("home");
     const guardedHomeState: PlantStoryHistoryState = {
       ...baseHomeState,
       exitGuard: true,
     };
 
-    const showHomeExitToast = () => {
-      if (exitReadyRef.current) {
-        resetExitReady();
-        window.history.back();
+    const installInitialHomeGuard = () => {
+      const state = window.history.state as
+        | PlantStoryHistoryState
+        | null;
+
+      if (
+        state?.plantStory === true &&
+        state.pageMode === "home" &&
+        state.exitGuard === true
+      ) {
         return;
       }
 
-      exitReadyRef.current = true;
-      setShowExitToast(true);
+      if (state?.plantStory === true && state.pageMode !== "home") {
+        return;
+      }
 
-      window.history.pushState(guardedHomeState, "", guardUrl);
-
-      clearExitTimer();
-      exitTimerRef.current = window.setTimeout(() => {
-        exitReadyRef.current = false;
-        setShowExitToast(false);
-        exitTimerRef.current = null;
-      }, 2000);
+      window.history.replaceState(baseHomeState, "", baseUrl);
+      window.history.pushState(guardedHomeState, "", baseUrl);
     };
 
-    const applyHistoryState = (state: PlantStoryHistoryState | null) => {
+    const handlePopState = (event: PopStateEvent) => {
+      const state = event.state as PlantStoryHistoryState | null;
+
+      const reachedHomeExitBoundary =
+        state?.plantStory === true &&
+        state.pageMode === "home" &&
+        state.exitGuard !== true;
+
+      if (reachedHomeExitBoundary) {
+        if (exitReadyRef.current) {
+          resetExitReady();
+          window.history.back();
+          return;
+        }
+
+        exitReadyRef.current = true;
+        setShowExitToast(true);
+        window.history.pushState(guardedHomeState, "", baseUrl);
+
+        clearExitTimer();
+        exitTimerRef.current = window.setTimeout(() => {
+          exitReadyRef.current = false;
+          setShowExitToast(false);
+          exitTimerRef.current = null;
+        }, 2000);
+
+        return;
+      }
+
       resetExitReady();
 
       if (!state?.plantStory) {
         clearPlantGuideState();
-        pageModeRef.current = "home";
         setPageMode("home");
         setSelectedPlantId(null);
         setSelectedGuideId(null);
@@ -230,7 +250,6 @@ function App() {
         setSelectedGuide(null);
       }
 
-      pageModeRef.current = state.pageMode;
       setPageMode(state.pageMode);
       setSelectedPlantId(state.plantId);
       setSelectedGuideId(state.guideId);
@@ -240,65 +259,19 @@ function App() {
       }
     };
 
-    const handleBackNavigation = (state: PlantStoryHistoryState | null) => {
-      const now = Date.now();
-
-      if (now - lastBackHandledAtRef.current < 120) {
-        return;
-      }
-
-      lastBackHandledAtRef.current = now;
-
-      const reachedHomeExitBoundary =
-        pageModeRef.current === "home" &&
-        state?.plantStory === true &&
-        state.pageMode === "home" &&
-        state.exitGuard !== true;
-
-      if (reachedHomeExitBoundary) {
-        showHomeExitToast();
-        return;
-      }
-
-      applyHistoryState(state);
-    };
-
-    const handlePopState = (event: PopStateEvent) => {
-      handleBackNavigation(
-        event.state as PlantStoryHistoryState | null
-      );
-    };
-
-    const handleHashChange = () => {
-      if (window.location.hash === "#plant-story-app") {
-        return;
-      }
-
-      handleBackNavigation(
-        window.history.state as PlantStoryHistoryState | null
-      );
-    };
-
-    const armHomeExitGuard = () => {
-      resetExitReady();
-      pageModeRef.current = "home";
-      window.history.replaceState(baseHomeState, "", baseUrl);
-      window.history.pushState(guardedHomeState, "", guardUrl);
-    };
-
     window.addEventListener("popstate", handlePopState);
-    window.addEventListener("hashchange", handleHashChange);
-    window.addEventListener("pageshow", armHomeExitGuard);
+    installInitialHomeGuard();
 
-    armHomeExitGuard();
+    const animationFrameId = window.requestAnimationFrame(() => {
+      installInitialHomeGuard();
+    });
 
     return () => {
+      window.cancelAnimationFrame(animationFrameId);
       clearExitTimer();
       window.removeEventListener("popstate", handlePopState);
-      window.removeEventListener("hashchange", handleHashChange);
-      window.removeEventListener("pageshow", armHomeExitGuard);
     };
-  }, [user]);
+  }, []);
 
   useEffect(() => {
     if (
