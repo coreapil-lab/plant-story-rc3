@@ -111,6 +111,8 @@ function App() {
 
   const exitReadyRef = useRef(false);
   const exitTimerRef = useRef<number | null>(null);
+  const pageModeRef = useRef<PageMode>("home");
+  const lastBackHandledAtRef = useRef(0);
 
   const selectedPlant =
     plants.find((plant) => plant.id === selectedPlantId) ?? null;
@@ -118,6 +120,10 @@ function App() {
   useEffect(() => {
     clearPlantGuideState();
   }, []);
+
+  useEffect(() => {
+    pageModeRef.current = pageMode;
+  }, [pageMode]);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -186,44 +192,32 @@ function App() {
       exitGuard: true,
     };
 
-    const handlePopState = (event: PopStateEvent) => {
-      const state = event.state as PlantStoryHistoryState | null;
-
-      const reachedHomeExitBoundary =
-        state?.plantStory === true &&
-        state.pageMode === "home" &&
-        state.exitGuard !== true;
-
-      if (reachedHomeExitBoundary) {
-        if (exitReadyRef.current) {
-          resetExitReady();
-          window.history.back();
-          return;
-        }
-
-        exitReadyRef.current = true;
-        setShowExitToast(true);
-
-        window.history.pushState(
-          guardedHomeState,
-          "",
-          guardUrl
-        );
-
-        clearExitTimer();
-        exitTimerRef.current = window.setTimeout(() => {
-          exitReadyRef.current = false;
-          setShowExitToast(false);
-          exitTimerRef.current = null;
-        }, 2000);
-
+    const showHomeExitToast = () => {
+      if (exitReadyRef.current) {
+        resetExitReady();
+        window.history.back();
         return;
       }
 
+      exitReadyRef.current = true;
+      setShowExitToast(true);
+
+      window.history.pushState(guardedHomeState, "", guardUrl);
+
+      clearExitTimer();
+      exitTimerRef.current = window.setTimeout(() => {
+        exitReadyRef.current = false;
+        setShowExitToast(false);
+        exitTimerRef.current = null;
+      }, 2000);
+    };
+
+    const applyHistoryState = (state: PlantStoryHistoryState | null) => {
       resetExitReady();
 
       if (!state?.plantStory) {
         clearPlantGuideState();
+        pageModeRef.current = "home";
         setPageMode("home");
         setSelectedPlantId(null);
         setSelectedGuideId(null);
@@ -236,6 +230,7 @@ function App() {
         setSelectedGuide(null);
       }
 
+      pageModeRef.current = state.pageMode;
       setPageMode(state.pageMode);
       setSelectedPlantId(state.plantId);
       setSelectedGuideId(state.guideId);
@@ -245,14 +240,63 @@ function App() {
       }
     };
 
-    window.addEventListener("popstate", handlePopState);
+    const handleBackNavigation = (state: PlantStoryHistoryState | null) => {
+      const now = Date.now();
 
-    window.history.replaceState(baseHomeState, "", baseUrl);
-    window.history.pushState(guardedHomeState, "", guardUrl);
+      if (now - lastBackHandledAtRef.current < 120) {
+        return;
+      }
+
+      lastBackHandledAtRef.current = now;
+
+      const reachedHomeExitBoundary =
+        pageModeRef.current === "home" &&
+        state?.plantStory === true &&
+        state.pageMode === "home" &&
+        state.exitGuard !== true;
+
+      if (reachedHomeExitBoundary) {
+        showHomeExitToast();
+        return;
+      }
+
+      applyHistoryState(state);
+    };
+
+    const handlePopState = (event: PopStateEvent) => {
+      handleBackNavigation(
+        event.state as PlantStoryHistoryState | null
+      );
+    };
+
+    const handleHashChange = () => {
+      if (window.location.hash === "#plant-story-app") {
+        return;
+      }
+
+      handleBackNavigation(
+        window.history.state as PlantStoryHistoryState | null
+      );
+    };
+
+    const armHomeExitGuard = () => {
+      resetExitReady();
+      pageModeRef.current = "home";
+      window.history.replaceState(baseHomeState, "", baseUrl);
+      window.history.pushState(guardedHomeState, "", guardUrl);
+    };
+
+    window.addEventListener("popstate", handlePopState);
+    window.addEventListener("hashchange", handleHashChange);
+    window.addEventListener("pageshow", armHomeExitGuard);
+
+    armHomeExitGuard();
 
     return () => {
       clearExitTimer();
       window.removeEventListener("popstate", handlePopState);
+      window.removeEventListener("hashchange", handleHashChange);
+      window.removeEventListener("pageshow", armHomeExitGuard);
     };
   }, [user]);
 
